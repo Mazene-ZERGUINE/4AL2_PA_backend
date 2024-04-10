@@ -1,14 +1,6 @@
 {
-<<<<<<< HEAD
-  "printWidth": 100,
-  "singleQuote": true,
-  "trailingComma": "all",
-  "tabWidth": 2
-}
-=======
   "printWidth": 90,
   "singleQuote": true,
   "trailingComma": "all",
   "tabWidth": 2
 }
->>>>>>> ca6b06e (chore: add config)
