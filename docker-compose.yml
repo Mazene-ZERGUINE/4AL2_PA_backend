@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres
+    container_name: pa_database_container
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${DATABASE_USER:-psql}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-psql}
+      POSTGRES_DB: pa_database
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+
+volumes:
+  postgres_data:
