@@ -9,10 +9,9 @@ services:
     environment:
       POSTGRES_USER: ${DATABASE_USER:-psql}
       POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-psql}
-      POSTGRES_DB: pa_database
+      POSTGRES_DB: ${DATABASE_NAME:-esgithub}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
 
 volumes:
   postgres_data:
