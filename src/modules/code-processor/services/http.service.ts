@@ -23,7 +23,7 @@ export class HttpService {
 		return response.data;
 	}
 
-	async post<T>(url: string, data?: any): Promise<T> {
+	async post<T, D>(url: string, data?: D): Promise<T> {
 		const response = (await this.axiosInstance.post(url, data)) as AxiosResponse<T>;
 		return response.data;
 	}

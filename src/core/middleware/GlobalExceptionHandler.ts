@@ -12,7 +12,7 @@ import { Request, Response } from 'express';
 export class GlobalExceptionHandler implements ExceptionFilter {
 	private readonly logger = new Logger(GlobalExceptionHandler.name);
 
-	catch(exception: HttpException, host: ArgumentsHost) {
+	catch(exception: HttpException, host: ArgumentsHost): void {
 		const ctx = host.switchToHttp();
 		const response = ctx.getResponse<Response>();
 		const request = ctx.getRequest<Request>();

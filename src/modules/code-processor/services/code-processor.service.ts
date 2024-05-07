@@ -9,20 +9,21 @@ import { TimeoutException } from '../../../core/exceptions/TimeoutException';
 export class CodeProcessorService {
 	constructor(private httpService: HttpService) {}
 
-	async runCode(sourceCode: string, programmingLanguage: ProgrammingLanguage) {
+	async runCode(
+		sourceCode: string,
+		programmingLanguage: ProgrammingLanguage,
+	): Promise<CodeResultsResponseDto> {
 		const data = {
 			programming_language: programmingLanguage,
 			source_code: sourceCode,
 		};
 		const response: CodeExecutedResponse = await this.httpService.post('execute/', data);
-		console.log(response);
 		const taskResult = await this.checkTaskStatus(response.task_id);
 		return taskResult;
 	}
 
 	async checkTaskStatus(taskId: string): Promise<CodeResultsResponseDto> {
 		for (let i = 0; i < 2; i++) {
-			console.log('Checking task status...');
 			const taskResult = await this.httpService.get<CodeResultsResponseDto>(
 				`result/${taskId}`,
 			);
