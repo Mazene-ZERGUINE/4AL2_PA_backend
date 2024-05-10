@@ -2,7 +2,7 @@ import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { ProgramEntity } from './program.entity';
 import { ProgrammingLanguageEnum } from '../enums/programming-language.enum';
 
-@Entity()
+@Entity('program-versions')
 export class ProgramVersionEntity {
 	@PrimaryGeneratedColumn('uuid')
 	programVersionId: string;

@@ -4,6 +4,8 @@ import { ProgrammingLanguageEnum } from '../enums/programming-language.enum';
 import { ProgramVisibilityEnum } from '../enums/program-visibility.enum';
 import { ProgramVersionEntity } from './program-version.entity';
 import { FileTypesEnum } from '../enums/file-types.enum';
+import { ReactionEntity } from './reaction.entity';
+import { CommentEntity } from './comment.entity';
 
 @Entity('program')
 export class ProgramEntity {
@@ -31,14 +33,23 @@ export class ProgramEntity {
 	@Column({ nullable: false })
 	userId: string;
 
-	@OneToMany(
-		() => ProgramVersionEntity,
-		(version: ProgramVersionEntity) => version.program,
-	)
+	@OneToMany(() => ProgramVersionEntity, (version) => version.program, {
+		cascade: ['remove'],
+	})
 	versions: ProgramVersionEntity[];
 
 	@ManyToMany(() => UserEntity, (user: UserEntity) => user.programmes)
 	user: UserEntity;
+
+	@OneToMany(() => ReactionEntity, (reaction) => reaction.program, {
+		cascade: ['remove'],
+	})
+	reactions: ReactionEntity[];
+
+	@OneToMany(() => CommentEntity, (comment) => comment.program, {
+		cascade: ['remove'],
+	})
+	comments: CommentEntity[];
 
 	@Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
 	createdAt: Date;
