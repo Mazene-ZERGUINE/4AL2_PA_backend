@@ -14,4 +14,4 @@ async function bootstrap(): Promise<void> {
 	await app.listen(3000);
 }
 
-bootstrap().then(() => console.log('🚀 server is running on port 3000'));
+bootstrap();
