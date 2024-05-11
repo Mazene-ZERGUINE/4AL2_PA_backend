@@ -46,7 +46,7 @@ export class UserEntity {
 	@OneToMany(() => ProgramEntity, (programme: ProgramEntity) => programme.user, {
 		cascade: ['insert', 'update', 'remove'],
 	})
-	programmes: ProgramEntity[];
+	programs: ProgramEntity[];
 
 	@OneToMany(() => FollowEntity, (follow) => follow.follower)
 	followings: FollowEntity[];
