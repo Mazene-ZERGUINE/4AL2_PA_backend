@@ -38,7 +38,7 @@ export class ProgramEntity {
 	})
 	versions: ProgramVersionEntity[];
 
-	@ManyToMany(() => UserEntity, (user: UserEntity) => user.programmes)
+	@ManyToMany(() => UserEntity, (user: UserEntity) => user.programs)
 	user: UserEntity;
 
 	@OneToMany(() => ReactionEntity, (reaction) => reaction.program, {
