@@ -14,14 +14,14 @@ export class GroupEntity {
 	groupId: string;
 
 	@Column({ nullable: false, length: 60 })
-	groupName: string;
+	name: string;
 
-	@Column({ nullable: true, length: 255 })
-	groupDescription: string;
+	@Column({ nullable: true, type: 'text' })
+	description?: string;
 
 	@OneToOne(() => UserEntity)
 	@JoinColumn()
-	groupCreator: UserEntity;
+	owner: UserEntity;
 
 	@ManyToMany(() => UserEntity, (user) => user.groups)
 	members: UserEntity[];
