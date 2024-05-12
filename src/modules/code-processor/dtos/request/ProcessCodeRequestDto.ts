@@ -6,9 +6,7 @@ export class ProcessCodeRequestDto {
 	@ApiProperty({ enum: ProgrammingLanguage, example: ProgrammingLanguage.JAVASCRIPT })
 	@IsNotEmpty()
 	@IsEnum(ProgrammingLanguage, {
-		message: `Unsupported programming language. Supported languages are: ${Object.values(
-			ProgrammingLanguage,
-		).join(', ')}`,
+		message: `Supported languages are: ${Object.values(ProgrammingLanguage).join(', ')}`,
 	})
 	readonly programmingLanguage: ProgrammingLanguage;
 
