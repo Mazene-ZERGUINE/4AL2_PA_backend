@@ -1,7 +1,9 @@
 import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { ProgrammingLanguage } from '../../enums/ProgrammingLanguage';
+import { ApiProperty } from '@nestjs/swagger';
 
 export class ProcessCodeRequestDto {
+	@ApiProperty({ enum: ProgrammingLanguage, example: ProgrammingLanguage.JAVASCRIPT })
 	@IsNotEmpty()
 	@IsEnum(ProgrammingLanguage, {
 		message: `Unsupported programming language. Supported languages are: ${Object.values(
@@ -10,6 +12,7 @@ export class ProcessCodeRequestDto {
 	})
 	readonly programmingLanguage: ProgrammingLanguage;
 
+	@ApiProperty({ example: "console.log('Hello, World!');" })
 	@IsNotEmpty()
 	@IsString()
 	readonly sourceCode: string;
