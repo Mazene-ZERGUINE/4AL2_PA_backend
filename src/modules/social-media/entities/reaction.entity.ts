@@ -11,7 +11,7 @@ import { UserEntity } from './user.entity';
 import { ProgramEntity } from './program.entity';
 
 @Entity()
-@Unique(['userId', 'programId'])
+@Unique(['program', 'user'])
 export class ReactionEntity {
 	@PrimaryGeneratedColumn('uuid')
 	reactionId: string;
