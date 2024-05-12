@@ -5,6 +5,7 @@ import { corsConfig } from './core/config/cors.config';
 import { validationPipeOptions } from './core/config/validation-pipe.config';
 import { GlobalExceptionHandler } from './core/middleware/GlobalExceptionHandler';
 import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
+import { DatabaseSeedService } from './modules/database-seed/database-seed.service';
 
 (async function bootstrap(): Promise<void> {
 	const app = await NestFactory.create(AppModule);
@@ -14,6 +15,10 @@ import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/
 	app.useGlobalFilters(new GlobalExceptionHandler());
 
 	addSwagger(app);
+
+	if (process.env.SEED_DATABASE === 'true') {
+		await app.get(DatabaseSeedService).seed();
+	}
 
 	await app.listen(3000);
 })()

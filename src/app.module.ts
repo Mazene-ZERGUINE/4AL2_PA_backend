@@ -6,6 +6,7 @@ import { createTypeOrmConfig } from './core/database/typeorm.config';
 import { CoreModule } from './core/core.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CodeProcessorModule } from './modules/code-processor/code-processor.module';
+import { DatabaseSeedModule } from './modules/database-seed/database-seed.module';
 import { SocialMediaModule } from './modules/social-media/social-media.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
@@ -14,6 +15,7 @@ import { join } from 'path';
 	imports: [
 		CoreModule,
 		AuthModule,
+		DatabaseSeedModule,
 		SocialMediaModule,
 		CodeProcessorModule,
 		ConfigModule.forRoot({
