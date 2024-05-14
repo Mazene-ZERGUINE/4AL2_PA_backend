@@ -59,4 +59,22 @@ export class ProgramEntity {
 		onUpdate: 'CURRENT_TIMESTAMP',
 	})
 	updatedAt: Date;
+
+	constructor(
+		description: string,
+		programmingLanguage: string,
+		sourceCode: string,
+		visibility: string,
+		inputTypes: FileTypesEnum[],
+		userId: string,
+		outputTypes: FileTypesEnum[],
+	) {
+		this.description = description;
+		this.programmingLanguage = programmingLanguage;
+		this.sourceCode = sourceCode;
+		this.visibility = visibility;
+		this.inputTypes = inputTypes;
+		this.userId = userId;
+		this.outputTypes = outputTypes;
+	}
 }
