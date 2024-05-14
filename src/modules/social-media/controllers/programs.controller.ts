@@ -12,10 +12,10 @@ export class ProgramsController {
   @Post('')
   @HttpCode(201)
   @ApiOkResponse({
-    description: '✅ program created',
+    description: 'program created',
   })
   @ApiBadRequestResponse({
-    description: '❌ missing field',
+    description: 'missing field',
   })
   async create(@Body() payload: CreateProgramDto): Promise<void> {
     await this.programService.saveProgram(payload);
@@ -24,10 +24,10 @@ export class ProgramsController {
   @Get('')
   @HttpCode(200)
   @ApiOkResponse({
-    description: '✅ program created',
+    description: 'program created',
   })
   @ApiBadRequestResponse({
-    description: '❌ bad params sent',
+    description: 'bad params sent',
   })
   async findBy(
     @Param() params: { type: ProgramVisibilityEnum },
