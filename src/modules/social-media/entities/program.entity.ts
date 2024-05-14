@@ -6,6 +6,7 @@ import { ProgramVersionEntity } from './program-version.entity';
 import { FileTypesEnum } from '../enums/file-types.enum';
 import { ReactionEntity } from './reaction.entity';
 import { CommentEntity } from './comment.entity';
+import { GetProgramDto } from '../dtos/response/GetProgramDto';
 
 @Entity('program')
 export class ProgramEntity {
@@ -16,7 +17,7 @@ export class ProgramEntity {
 	description?: string;
 
 	@Column({ nullable: false, enum: ProgrammingLanguageEnum })
-	programmingLanguage: string;
+	programmingLanguage: ProgrammingLanguageEnum;
 
 	@Column({ nullable: false })
 	sourceCode: string;
@@ -62,7 +63,7 @@ export class ProgramEntity {
 
 	constructor(
 		description: string,
-		programmingLanguage: string,
+		programmingLanguage: ProgrammingLanguageEnum,
 		sourceCode: string,
 		visibility: string,
 		inputTypes: FileTypesEnum[],
@@ -76,5 +77,9 @@ export class ProgramEntity {
 		this.inputTypes = inputTypes;
 		this.userId = userId;
 		this.outputTypes = outputTypes;
+	}
+
+	toGetProgramDto(): GetProgramDto {
+		return new GetProgramDto(this);
 	}
 }

@@ -4,6 +4,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ProgramEntity } from '../entities/program.entity';
 import { Repository } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
+import { ProgramVisibilityEnum } from '../enums/program-visibility.enum';
+import { GetProgramDto } from '../dtos/response/GetProgramDto';
 
 @Injectable()
 export class ProgramsService {
@@ -26,5 +28,15 @@ export class ProgramsService {
 		} catch (error) {
 			throw new InternalServerErrorException('Failed to save the program.');
 		}
+	}
+
+	async getProgramByVisibility(
+		visibility: ProgramVisibilityEnum,
+	): Promise<GetProgramDto[]> {
+		const visiblePrograms: ProgramEntity[] = await this.programRepository.findBy({
+			visibility: visibility,
+		});
+
+		return visiblePrograms.map((entity) => entity.toGetProgramDto());
 	}
 }
