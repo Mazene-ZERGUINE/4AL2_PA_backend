@@ -23,6 +23,7 @@ export class AuthController {
 	// TODO doc
 	@Post('sign-up')
 	async signUp(@Body() userDTO: CreateUserDto): Promise<AccessTokenDto> {
+		// todo return type
 		return await this.userService.create(userDTO);
 	}
 
