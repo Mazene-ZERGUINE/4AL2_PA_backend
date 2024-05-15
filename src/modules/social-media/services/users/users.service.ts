@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from '../../dtos/create-user.dto';
 import { LoginDTO } from '../../../auth/dtos/login.dto';
 import { AccessTokenDto } from '../../../auth/dtos/access-token.dto';
+import { genSalt, hash } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
@@ -15,25 +16,35 @@ export class UsersService {
 	) {}
 
 	async create(userDto: CreateUserDto): Promise<AccessTokenDto> {
-		const user = this.userRepository.create(userDto);
+		const newUser = this.userRepository.create(userDto);
+		newUser.password = await hash(newUser.password, await genSalt());
 
-		await this.userRepository.save(user);
+		await this.userRepository.save(newUser);
 
 		return {
 			accessToken: await this.jwtService.signAsync({
-				email: user.email,
-				sub: user.userId,
-				username: user.userName,
+				email: newUser.email,
+				sub: newUser.userId,
+				username: newUser.userName,
 			}),
 		};
 	}
 
 	async find(login: LoginDTO): Promise<null | UserEntity> {
-		const user = await this.userRepository.findOneBy({ email: login.email });
-		if (!user) {
+		const foundUser = await this.userRepository.findOneBy({ email: login.email });
+		if (!foundUser) {
 			throw new UnauthorizedException('Mauvais identifiants.');
 		}
 
-		return user;
+		return foundUser;
+	}
+
+	async testGetUser(email: string): Promise<UserEntity> {
+		const foundUser = await this.userRepository.findOneBy({ email });
+		if (!foundUser) {
+			throw new UnauthorizedException('🤌');
+		}
+
+		return foundUser;
 	}
 }

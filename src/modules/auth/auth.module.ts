@@ -1,18 +1,28 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { AuthController } from './controllers/auth/auth.controller';
 import { AuthService } from './services/auth/auth.service';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule, JwtService } from '@nestjs/jwt';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { SocialMediaModule } from '../social-media/social-media.module';
+import { JwtConfigService } from './services/jwt-config/jwt-config.service';
 
 @Module({
 	controllers: [AuthController],
 	imports: [
+		// JwtModule.registerAsync({
+		// 	imports: [ConfigModule],
+		// 	useClass: JwtConfigService,
+		// }),
 		JwtModule.register({
 			secret: process.env.JWT_SECRET,
 			signOptions: {
-				expiresIn: '1d',
+				expiresIn: process.env.JWT_EXPIRATION_TIME,
 			},
 		}),
+
+		forwardRef(() => SocialMediaModule),
 	],
-	providers: [AuthService],
+	exports: [JwtService],
+	providers: [AuthService, JwtStrategy, JwtConfigService, JwtService],
 })
 export class AuthModule {}

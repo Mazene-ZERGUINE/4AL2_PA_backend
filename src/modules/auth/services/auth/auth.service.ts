@@ -13,15 +13,22 @@ export class AuthService {
 		private readonly jwtService: JwtService,
 	) {}
 
-	async login(loginDTO: LoginDTO): Promise<AccessTokenDto> {
+	async generateJsonWebToken(loginDTO: LoginDTO): Promise<AccessTokenDto> {
 		const user = await this.userService.find(loginDTO);
 
 		if (!(await this.isPasswordMatching(loginDTO.password, user.password))) {
 			throw new UnauthorizedException('Mauvais identifiants.');
 		}
 
+		// return {
+		// 	accessToken: await this.jwtService.signAsync({
+		// 		email: user.email,
+		// 		sub: user.userId,
+		// 		username: user.userName,
+		// 	}),
+		// };
 		return {
-			accessToken: await this.jwtService.signAsync({
+			accessToken: this.jwtService.sign({
 				email: user.email,
 				sub: user.userId,
 				username: user.userName,
