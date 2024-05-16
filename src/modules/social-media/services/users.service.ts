@@ -2,11 +2,11 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserEntity } from '../../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { CreateUserDto } from '../../dtos/create-user.dto';
-import { LoginDTO } from '../../../auth/dtos/login.dto';
-import { AccessTokenDto } from '../../../auth/dtos/access-token.dto';
+import { CreateUserDto } from '../../../auth/dtos/request/create-user.dto';
+import { LoginDTO } from '../../../auth/dtos/request/login.dto';
 import { genSalt, hash } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UserExistException } from '../../../../core/exceptions/UserExistException';
 
 @Injectable()
 export class UsersService {
@@ -15,19 +15,14 @@ export class UsersService {
 		@InjectRepository(UserEntity) private readonly userRepository: Repository<UserEntity>,
 	) {}
 
-	async create(userDto: CreateUserDto): Promise<AccessTokenDto> {
+	async create(userDto: CreateUserDto): Promise<void> {
+		const isUserExist = await this.userRepository.findOneBy({ email: userDto.email });
+		if (isUserExist) {
+			throw new UserExistException(` user ${userDto.email} already exists`);
+		}
 		const newUser = this.userRepository.create(userDto);
 		newUser.password = await hash(newUser.password, await genSalt());
-
 		await this.userRepository.save(newUser);
-
-		return {
-			accessToken: await this.jwtService.signAsync({
-				email: newUser.email,
-				sub: newUser.userId,
-				username: newUser.userName,
-			}),
-		};
 	}
 
 	async find(login: LoginDTO): Promise<null | UserEntity> {
