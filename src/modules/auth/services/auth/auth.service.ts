@@ -1,11 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { compare } from 'bcrypt';
 
-import { UsersService } from '../../../social-media/services/users/users.service';
-import { LoginDTO } from '../../dtos/login.dto';
+import { UsersService } from '../../../social-media/services/users.service';
+import { LoginDTO } from '../../dtos/request/login.dto';
 import { JwtService } from '@nestjs/jwt';
-import { AccessTokenDto } from '../../dtos/access-token.dto';
+import { AccessTokenDto } from '../../dtos/response/access-token.dto';
 import { ConfigService } from '@nestjs/config';
+import { HttpNotFoundException } from '../../../../core/exceptions/HttpNotFoundException';
 
 @Injectable()
 export class AuthService {
@@ -16,12 +17,11 @@ export class AuthService {
 	) {}
 
 	async generateJsonWebToken(loginDTO: LoginDTO): Promise<AccessTokenDto> {
-		const user = await this.userService.find(loginDTO);
+		const user = await this.userService.findByEmail(loginDTO.email);
 
 		if (!(await this.isPasswordMatching(loginDTO.password, user.password))) {
-			throw new UnauthorizedException('Mauvais identifiants.');
+			throw new HttpNotFoundException('Bad credentials');
 		}
-
 		return {
 			accessToken: await this.jwtService.signAsync(
 				{

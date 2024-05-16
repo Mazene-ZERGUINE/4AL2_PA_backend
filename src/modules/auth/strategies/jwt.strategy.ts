@@ -1,8 +1,8 @@
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { UnauthorizedException } from '@nestjs/common';
-import { UsersService } from '../../social-media/services/users/users.service';
-import { LoginDTO } from '../dtos/login.dto';
+import { UsersService } from '../../social-media/services/users.service';
+import { LoginDTO } from '../dtos/request/login.dto';
 
 export class JwtStrategy extends PassportStrategy(Strategy) {
 	constructor(private readonly usersService: UsersService) {
@@ -20,7 +20,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 			throw new UnauthorizedException();
 		}
 
-		const foundUser = await this.usersService.find(payload);
+		const foundUser = await this.usersService.findByEmail(payload.email);
 		if (!foundUser) {
 			throw new UnauthorizedException();
 		}
