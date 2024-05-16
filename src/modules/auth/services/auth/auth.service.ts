@@ -23,14 +23,11 @@ export class AuthService {
 			throw new HttpNotFoundException('Bad credentials');
 		}
 		return {
-			accessToken: await this.jwtService.signAsync(
-				{
-					email: user.email,
-					sub: user.userId,
-					username: user.userName,
-				},
-				// { secret: process.env.JWT_SECRET },
-			),
+			accessToken: await this.jwtService.signAsync({
+				email: user.email,
+				sub: user.userId,
+				username: user.userName,
+			}),
 		};
 	}
 
