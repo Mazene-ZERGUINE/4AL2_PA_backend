@@ -63,8 +63,8 @@ export class AuthController {
 	})
 	@HttpCode(200)
 	@Get('get_info')
-	async getUserInfo(@Request() req): Promise<UserDataDto> {
-		const userEmail = req.user.email;
+	async getUserInfo(@Request() request): Promise<UserDataDto> {
+		const userEmail = request.user.email;
 		const user = await this.userService.findByEmail(userEmail);
 		return user.toUserDataDto();
 	}
