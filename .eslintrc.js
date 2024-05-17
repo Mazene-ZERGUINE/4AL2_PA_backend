@@ -6,13 +6,20 @@ module.exports = {
 		tsconfigRootDir: __dirname,
 		sourceType: 'module',
 	},
-	plugins: ['@typescript-eslint/eslint-plugin', 'unused-imports', 'jest'],
+	plugins: [
+		'@typescript-eslint/eslint-plugin',
+		'eslint-plugin-prettier',
+		'eslint-plugin-unused-imports',
+		'unused-imports',
+		'jest',
+	],
 	extends: [
 		'plugin:@typescript-eslint/recommended',
 		'eslint:recommended',
 		'plugin:jest/recommended',
 		'plugin:jest/style',
 		'prettier',
+		'eslint-config-prettier',
 		'plugin:prettier/recommended',
 	],
 	overrides: [
@@ -30,6 +37,8 @@ module.exports = {
 	},
 	ignorePatterns: ['.eslintrc.js'],
 	rules: {
+		indent: ['off', 'tab'],
+		'prettier/prettier': ['error', { useTabs: true }],
 		'@typescript-eslint/interface-name-prefix': 'off',
 		'@typescript-eslint/explicit-function-return-type': 'warn',
 		'@typescript-eslint/explicit-module-boundary-types': 'warn',

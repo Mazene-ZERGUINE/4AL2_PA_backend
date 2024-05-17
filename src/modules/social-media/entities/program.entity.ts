@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToMany } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { ProgrammingLanguageEnum } from '../enums/programming-language.enum';
 import { ProgramVisibilityEnum } from '../enums/program-visibility.enum';
@@ -6,6 +6,7 @@ import { ProgramVersionEntity } from './program-version.entity';
 import { FileTypesEnum } from '../enums/file-types.enum';
 import { ReactionEntity } from './reaction.entity';
 import { CommentEntity } from './comment.entity';
+import { GetProgramDto } from '../dtos/response/get-program.dto';
 
 @Entity('program')
 export class ProgramEntity {
@@ -16,7 +17,7 @@ export class ProgramEntity {
 	description?: string;
 
 	@Column({ nullable: false, enum: ProgrammingLanguageEnum })
-	programmingLanguage: string;
+	programmingLanguage: ProgrammingLanguageEnum;
 
 	@Column({ nullable: false })
 	sourceCode: string;
@@ -30,16 +31,13 @@ export class ProgramEntity {
 	@Column({ type: 'simple-array', nullable: false, enum: FileTypesEnum })
 	outputTypes: FileTypesEnum[];
 
-	@Column({ nullable: false })
-	userId: string;
+	@ManyToOne(() => UserEntity, (user) => user.programs)
+	user: UserEntity;
 
 	@OneToMany(() => ProgramVersionEntity, (version) => version.program, {
 		cascade: ['remove'],
 	})
 	versions: ProgramVersionEntity[];
-
-	@ManyToMany(() => UserEntity, (user: UserEntity) => user.programs)
-	user: UserEntity;
 
 	@OneToMany(() => ReactionEntity, (reaction) => reaction.program, {
 		cascade: ['remove'],
@@ -59,4 +57,28 @@ export class ProgramEntity {
 		onUpdate: 'CURRENT_TIMESTAMP',
 	})
 	updatedAt: Date;
+
+	constructor(
+		description: string,
+		programmingLanguage: ProgrammingLanguageEnum,
+		sourceCode: string,
+		visibility: string,
+		inputTypes: FileTypesEnum[],
+		user: UserEntity,
+		outputTypes: FileTypesEnum[],
+	) {
+		this.description = description;
+		this.programmingLanguage = programmingLanguage;
+		this.sourceCode = sourceCode;
+		this.visibility = visibility;
+		this.inputTypes = inputTypes;
+		this.user = user;
+		this.outputTypes = outputTypes;
+	}
+
+	toGetProgramDto(): GetProgramDto {
+		const dto = new GetProgramDto(this);
+		dto.user = this.user.toUserDataDto();
+		return dto;
+	}
 }

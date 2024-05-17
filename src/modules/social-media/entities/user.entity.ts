@@ -12,6 +12,7 @@ import { FollowEntity } from './follow.entity';
 import { GroupEntity } from './group.entity';
 import { ReactionEntity } from './reaction.entity';
 import { CommentEntity } from './comment.entity';
+import { UserDataDto } from '../dtos/response/user-data.dto';
 
 @Entity('users')
 export class UserEntity {
@@ -43,7 +44,7 @@ export class UserEntity {
 	@Column({ nullable: false, default: false })
 	isVerified: boolean = false;
 
-	@OneToMany(() => ProgramEntity, (programme: ProgramEntity) => programme.user, {
+	@OneToMany(() => ProgramEntity, (program) => program.user, {
 		cascade: ['insert', 'update', 'remove'],
 	})
 	programs: ProgramEntity[];
@@ -86,4 +87,16 @@ export class UserEntity {
 		onUpdate: 'CURRENT_TIMESTAMP',
 	})
 	updatedAt: Date;
+
+	toUserDataDto(): UserDataDto {
+		return new UserDataDto(
+			this.userId,
+			this.userName,
+			this.firstName,
+			this.lastName,
+			this.email,
+			this.bio,
+			this.avatarUrl,
+		);
+	}
 }

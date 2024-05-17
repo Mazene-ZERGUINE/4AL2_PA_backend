@@ -33,6 +33,10 @@ export class UsersService {
 		return foundUser;
 	}
 
+	async findById(userId: string): Promise<UserEntity | null> {
+		return await this.userRepository.findOneBy({ userId: userId });
+	}
+
 	async testGetUser(email: string): Promise<UserEntity> {
 		const foundUser = await this.userRepository.findOneBy({ email });
 		if (!foundUser) {
