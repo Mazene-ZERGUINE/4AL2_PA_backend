@@ -63,7 +63,8 @@ export class AuthController {
 	})
 	@HttpCode(200)
 	@Get('get_info')
-	async getUserInfo(@Request() request): Promise<UserDataDto> {
+	// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+	async getUserInfo(@Request() request: any): Promise<UserDataDto> {
 		const userEmail = request.user.email;
 		const user = await this.userService.findByEmail(userEmail);
 		return user.toUserDataDto();
