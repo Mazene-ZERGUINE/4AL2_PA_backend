@@ -3,7 +3,8 @@ import {
 	Controller,
 	Get,
 	HttpCode,
-	Post, Query,
+	Post,
+	Query,
 	Request,
 	UseGuards,
 } from '@nestjs/common';
@@ -21,7 +22,7 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { UserDataDto } from '../../social-media/dtos/response/user-data.dto';
-import {UserEntity} from "../../social-media/entities/user.entity";
+import { UserEntity } from '../../social-media/entities/user.entity';
 
 @ApiTags('auth')
 @Controller('auth')
