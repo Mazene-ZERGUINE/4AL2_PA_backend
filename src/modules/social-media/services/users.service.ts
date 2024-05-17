@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { UserEntity } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -20,6 +20,7 @@ export class UsersService {
 		if (isUserExist) {
 			throw new HttpExistsException(` user ${userDto.email} already exists`);
 		}
+
 		const newUser = this.userRepository.create(userDto);
 		newUser.password = await hash(newUser.password, await genSalt());
 		await this.userRepository.save(newUser);
@@ -40,7 +41,7 @@ export class UsersService {
 	async testGetUser(email: string): Promise<UserEntity> {
 		const foundUser = await this.userRepository.findOneBy({ email });
 		if (!foundUser) {
-			throw new UnauthorizedException('🤌');
+			throw new BadRequestException('🤌');
 		}
 
 		return foundUser;

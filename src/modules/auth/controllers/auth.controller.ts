@@ -4,6 +4,7 @@ import {
 	Get,
 	HttpCode,
 	Post,
+	Query,
 	Request,
 	UseGuards,
 } from '@nestjs/common';
@@ -21,35 +22,32 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { UserDataDto } from '../../social-media/dtos/response/user-data.dto';
+import { UserEntity } from '../../social-media/entities/user.entity';
 
 @ApiTags('auth')
 @Controller('auth')
+@ApiTags('Authentication')
 export class AuthController {
 	constructor(
 		private readonly userService: UsersService,
 		private readonly authService: AuthService,
 	) {}
 
+	@Post('login')
+	@HttpCode(200)
 	@ApiOkResponse({
 		description: 'login',
+		type: AccessTokenDto,
 	})
-	@ApiNotFoundResponse({
-		description: 'bad credentials (user not found)',
-	})
-	@HttpCode(200)
-	@Post('login')
+	@ApiNotFoundResponse({ description: 'bad credentials (user not found)' })
 	async login(@Body() loginDTO: LoginDTO): Promise<AccessTokenDto> {
 		return this.authService.generateJsonWebToken(loginDTO);
 	}
 
-	@ApiCreatedResponse({
-		description: 'no content 201 response',
-	})
-	@ApiBadRequestResponse({
-		description: 'user already exists',
-	})
 	@Post('sign-up')
 	@HttpCode(201)
+	@ApiCreatedResponse({ description: 'no content 201 response' })
+	@ApiBadRequestResponse({ description: 'user already exists' })
 	async signUp(@Body() userDTO: CreateUserDto): Promise<void> {
 		await this.userService.create(userDTO);
 	}
@@ -68,5 +66,11 @@ export class AuthController {
 		const userEmail = request.user.email;
 		const user = await this.userService.findByEmail(userEmail);
 		return user.toUserDataDto();
+	}
+	@Get('user-test')
+	@ApiOkResponse({ type: UserEntity })
+	@ApiBadRequestResponse()
+	async testGetUser(@Query('email') email: string): Promise<UserEntity> {
+		return await this.userService.testGetUser(email);
 	}
 }

@@ -15,7 +15,6 @@ export class JwtConfigService implements JwtOptionsFactory {
 
 		return {
 			secret,
-			secretOrPrivateKey: secret,
 			signOptions: {
 				expiresIn: this.configService.get('JWT_EXPIRATION_TIME', ONE_DAY),
 			},
