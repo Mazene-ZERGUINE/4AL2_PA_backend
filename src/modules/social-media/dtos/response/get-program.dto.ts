@@ -25,6 +25,7 @@ export class GetProgramDto {
 		this.outputTypes = program.outputTypes;
 		this.createdAt = program.createdAt;
 		this.updatedAt = program.updatedAt;
+		this.visibility = program.visibility;
 		this.user = program.user ? program.user.toUserDataDto() : null;
 	}
 }
