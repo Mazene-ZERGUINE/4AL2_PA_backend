@@ -3,6 +3,8 @@ import {
 	Controller,
 	Get,
 	HttpCode,
+	Param,
+	Patch,
 	Post,
 	Query,
 	Request,
@@ -23,10 +25,10 @@ import {
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { UserDataDto } from '../../social-media/dtos/response/user-data.dto';
 import { UserEntity } from '../../social-media/entities/user.entity';
+import { UpdatePasswordDto } from '../dtos/request/update-password.dto';
 
 @ApiTags('auth')
 @Controller('auth')
-@ApiTags('Authentication')
 export class AuthController {
 	constructor(
 		private readonly userService: UsersService,
@@ -69,8 +71,24 @@ export class AuthController {
 	}
 	@Get('user-test')
 	@ApiOkResponse({ type: UserEntity })
-	@ApiBadRequestResponse()
+	@ApiBadRequestResponse({})
 	async testGetUser(@Query('email') email: string): Promise<UserEntity> {
 		return await this.userService.testGetUser(email);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Patch('/update-password/:userId')
+	@HttpCode(200)
+	@ApiOkResponse({
+		description: 'password updated',
+	})
+	@ApiBadRequestResponse({
+		description: 'current password does not mathc',
+	})
+	async updatePassword(
+		@Body() payload: UpdatePasswordDto,
+		@Param('userId') userId: string,
+	): Promise<void> {
+		await this.authService.updatePassword(payload, userId);
 	}
 }
