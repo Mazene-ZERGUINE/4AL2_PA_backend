@@ -7,6 +7,7 @@ import { genSalt, hash } from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { HttpExistsException } from '../../../core/exceptions/HttpExistsException';
 import { HttpNotFoundException } from '../../../core/exceptions/HttpNotFoundException';
+import { UpdateAccountDto } from '../dtos/request/update-account.dto';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +21,6 @@ export class UsersService {
 		if (isUserExist) {
 			throw new HttpExistsException(` user ${userDto.email} already exists`);
 		}
-
 		const newUser = this.userRepository.create(userDto);
 		newUser.password = await hash(newUser.password, await genSalt());
 		await this.userRepository.save(newUser);
@@ -43,7 +43,36 @@ export class UsersService {
 		if (!foundUser) {
 			throw new BadRequestException('🤌');
 		}
-
 		return foundUser;
+	}
+
+	async partialUpdate(payload: UpdateAccountDto, userId: string): Promise<void> {
+		const user = await this.userRepository.findOne({ where: { userId: userId } });
+		if (!user) {
+			throw new HttpNotFoundException('user not found');
+		}
+		for (const key in payload) {
+			if (
+				Object.prototype.hasOwnProperty.call(payload, key) &&
+				payload[key] !== null &&
+				payload[key] !== undefined
+			) {
+				user[key] = payload[key];
+			}
+		}
+		await this.userRepository.save(user);
+	}
+
+	async updateProfileImage(userId: string, imageUrl: string): Promise<void> {
+		const user = await this.userRepository.findOne({ where: { userId: userId } });
+		if (!user) {
+			throw new HttpNotFoundException('user not found');
+		}
+		user.avatarUrl = imageUrl;
+		await this.userRepository.save(user);
+	}
+
+	async save(user: UserEntity): Promise<void> {
+		await this.userRepository.save(user);
 	}
 }
