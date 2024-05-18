@@ -7,6 +7,8 @@ import { CoreModule } from './core/core.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CodeProcessorModule } from './modules/code-processor/code-processor.module';
 import { SocialMediaModule } from './modules/social-media/social-media.module';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 
 @Module({
 	imports: [
@@ -22,6 +24,10 @@ import { SocialMediaModule } from './modules/social-media/social-media.module';
 			imports: [ConfigModule],
 			inject: [ConfigService],
 			useFactory: createTypeOrmConfig,
+		}),
+		ServeStaticModule.forRoot({
+			rootPath: join(__dirname, '..', 'uploads', 'avatars'),
+			serveRoot: '/uploads/avatars',
 		}),
 	],
 })
