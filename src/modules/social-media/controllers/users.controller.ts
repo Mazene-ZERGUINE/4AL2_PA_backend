@@ -9,6 +9,7 @@ import {
 	UploadedFile,
 	Request,
 	UseGuards,
+	Get,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { UpdateAccountDto } from '../dtos/request/update-account.dto';
@@ -18,6 +19,7 @@ import { multerOptions } from '../../../core/middleware/multer.config';
 import { Express } from 'express';
 import { ConfigService } from '@nestjs/config';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { UserDataDto } from '../dtos/response/user-data.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -63,5 +65,14 @@ export class UsersController {
 		return {
 			url: imageUrl,
 		};
+	}
+	@UseGuards(JwtAuthGuard)
+	@Get('/:userId')
+	@HttpCode(200)
+	@ApiOkResponse({
+		description: 'return user info',
+	})
+	async getUserData(@Param('userId') userId: string): Promise<UserDataDto> {
+		return this.userService.findById(userId);
 	}
 }
