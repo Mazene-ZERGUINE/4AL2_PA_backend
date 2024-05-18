@@ -46,4 +46,12 @@ export class ProgramsService {
 		});
 		return visiblePrograms.map((entity) => entity.toGetProgramDto());
 	}
+
+	async getUserPrograms(userId: string): Promise<GetProgramDto[]> {
+		const userPrograms: ProgramEntity[] = await this.programRepository.find({
+			where: { user: { userId: userId } },
+			relations: ['user'],
+		});
+		return userPrograms.map((program) => program.toGetProgramDto());
+	}
 }
