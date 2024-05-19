@@ -2,6 +2,7 @@
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 import { extname, join } from 'path';
+import { Express } from 'express';
 
 export const multerOptions = {
 	storage: diskStorage({
@@ -15,7 +16,11 @@ export const multerOptions = {
 			cb(null, `${randomName}${fileExtName}`);
 		},
 	}),
-	fileFilter: (req, file, cb) => {
+	fileFilter: (
+		req: Request,
+		file: Express.Multer.File,
+		cb: (error: Error | null, acceptFile: boolean) => void,
+	): void => {
 		if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
 			return cb(new Error('Unsupported file type'), false);
 		}

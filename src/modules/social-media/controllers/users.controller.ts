@@ -58,6 +58,7 @@ export class UsersController {
 	})
 	async uploadProfileImage(
 		@UploadedFile() file: Express.Multer.File,
+		// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 		@Request() request: any,
 	): Promise<{ url: string }> {
 		const imageUrl = `${this.apiUrl}/uploads/avatars/${file.filename}`;
