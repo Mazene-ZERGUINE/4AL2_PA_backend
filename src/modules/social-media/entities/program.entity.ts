@@ -23,7 +23,7 @@ export class ProgramEntity {
 	sourceCode: string;
 
 	@Column({ nullable: false, enum: ProgramVisibilityEnum })
-	visibility: string;
+	visibility: ProgramVisibilityEnum;
 
 	@Column({ type: 'simple-array', nullable: false, enum: FileTypesEnum })
 	inputTypes: FileTypesEnum[];
@@ -62,7 +62,7 @@ export class ProgramEntity {
 		description: string,
 		programmingLanguage: ProgrammingLanguageEnum,
 		sourceCode: string,
-		visibility: string,
+		visibility: ProgramVisibilityEnum,
 		inputTypes: FileTypesEnum[],
 		user: UserEntity,
 		outputTypes: FileTypesEnum[],
@@ -78,7 +78,7 @@ export class ProgramEntity {
 
 	toGetProgramDto(): GetProgramDto {
 		const dto = new GetProgramDto(this);
-		dto.user = this.user.toUserDataDto();
+		dto.user !== null ? (dto.user = this.user.toUserDataDto()) : null;
 		return dto;
 	}
 }
