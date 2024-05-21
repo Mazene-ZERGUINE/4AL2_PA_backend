@@ -25,7 +25,6 @@ export class UsersService {
 		newUser.password = await hash(newUser.password, await genSalt());
 		await this.userRepository.save(newUser);
 	}
-
 	async findByEmail(email: string): Promise<null | UserEntity> {
 		const foundUser = await this.userRepository.findOneBy({ email: email });
 		if (!foundUser) {
@@ -33,11 +32,9 @@ export class UsersService {
 		}
 		return foundUser;
 	}
-
 	async findById(userId: string): Promise<UserEntity | null> {
 		return await this.userRepository.findOneBy({ userId: userId });
 	}
-
 	async testGetUser(email: string): Promise<UserEntity> {
 		const foundUser = await this.userRepository.findOneBy({ email });
 		if (!foundUser) {

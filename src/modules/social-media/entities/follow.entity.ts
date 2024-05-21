@@ -11,4 +11,9 @@ export class FollowEntity {
 
 	@ManyToOne(() => UserEntity, (user: UserEntity) => user.followers)
 	following: UserEntity;
+
+	constructor(follower: UserEntity, following: UserEntity) {
+		this.follower = follower;
+		this.following = following;
+	}
 }

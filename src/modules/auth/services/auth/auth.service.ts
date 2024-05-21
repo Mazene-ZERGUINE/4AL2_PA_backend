@@ -45,8 +45,7 @@ export class AuthService {
 		if (!(await this.isPasswordMatching(payload.currentPassword, user.password))) {
 			throw new BadRequestException("current password don't match");
 		}
-
-		user.password = await await hash(payload.newPassword, await genSalt());
+		user.password = await hash(payload.newPassword, await genSalt());
 		await this.userService.save(user);
 	}
 
