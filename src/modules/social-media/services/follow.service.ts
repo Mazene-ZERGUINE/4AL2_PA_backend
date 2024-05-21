@@ -27,7 +27,6 @@ export class FollowService {
 			throw new HttpNotFoundException('user not found');
 		}
 		const followEntity = new FollowEntity(follower, following);
-		console.log(followEntity); // Add this log to debug
 		await this.followRepository.save(followEntity);
 	}
 	async getFollowersAndFollowings(userId: string): Promise<UserWithFollowersDto> {
