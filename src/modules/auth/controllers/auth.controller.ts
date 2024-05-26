@@ -6,7 +6,6 @@ import {
 	Param,
 	Patch,
 	Post,
-	Query,
 	Request,
 	UseGuards,
 } from '@nestjs/common';
@@ -24,7 +23,6 @@ import {
 } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 import { UserDataDto } from '../../social-media/dtos/response/user-data.dto';
-import { UserEntity } from '../../social-media/entities/user.entity';
 import { UpdatePasswordDto } from '../dtos/request/update-password.dto';
 
 @ApiTags('auth')
@@ -68,12 +66,6 @@ export class AuthController {
 		const userEmail = request.user.email;
 		const user = await this.userService.findByEmail(userEmail);
 		return user.toUserDataDto();
-	}
-	@Get('user-test')
-	@ApiOkResponse({ type: UserEntity })
-	@ApiBadRequestResponse({})
-	async testGetUser(@Query('email') email: string): Promise<UserEntity> {
-		return await this.userService.testGetUser(email);
 	}
 
 	@UseGuards(JwtAuthGuard)
