@@ -9,11 +9,21 @@ import { UsersController } from './controllers/users.controller';
 import { FollowController } from './controllers/follow.controller';
 import { FollowService } from './services/follow.service';
 import { FollowEntity } from './entities/follow.entity';
+import { VersionsService } from './services/versions.service';
+import { VersionsController } from './controllers/versions.controller';
+import { ProgramVersionEntity } from './entities/program-version.entity';
 
 @Module({
-	imports: [TypeOrmModule.forFeature([UserEntity, ProgramEntity, FollowEntity])],
+	imports: [
+		TypeOrmModule.forFeature([
+			UserEntity,
+			ProgramEntity,
+			FollowEntity,
+			ProgramVersionEntity,
+		]),
+	],
 	exports: [UsersService, TypeOrmModule, ProgramsService],
-	providers: [UsersService, ProgramsService, FollowService],
-	controllers: [ProgramController, UsersController, FollowController],
+	providers: [UsersService, ProgramsService, FollowService, VersionsService],
+	controllers: [ProgramController, UsersController, FollowController, VersionsController],
 })
 export class SocialMediaModule {}
