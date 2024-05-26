@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UserEntity } from '../entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import { HttpExistsException } from '../../../core/exceptions/HttpExistsException';
 import { HttpNotFoundException } from '../../../core/exceptions/HttpNotFoundException';
 import { UpdateAccountDto } from '../dtos/request/update-account.dto';
+import { merge } from 'lodash';
 
 @Injectable()
 export class UsersService {
@@ -35,28 +36,13 @@ export class UsersService {
 	async findById(userId: string): Promise<UserEntity | null> {
 		return await this.userRepository.findOneBy({ userId: userId });
 	}
-	async testGetUser(email: string): Promise<UserEntity> {
-		const foundUser = await this.userRepository.findOneBy({ email });
-		if (!foundUser) {
-			throw new BadRequestException('🤌');
-		}
-		return foundUser;
-	}
 
 	async partialUpdate(payload: UpdateAccountDto, userId: string): Promise<void> {
 		const user = await this.userRepository.findOne({ where: { userId: userId } });
 		if (!user) {
 			throw new HttpNotFoundException('user not found');
 		}
-		for (const key in payload) {
-			if (
-				Object.prototype.hasOwnProperty.call(payload, key) &&
-				payload[key] !== null &&
-				payload[key] !== undefined
-			) {
-				user[key] = payload[key];
-			}
-		}
+		merge(user, payload);
 		await this.userRepository.save(user);
 	}
 
