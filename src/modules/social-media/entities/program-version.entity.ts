@@ -21,4 +21,16 @@ export class ProgramVersionEntity {
 
 	@Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
 	createdAt: Date;
+
+	constructor(
+		originalProgram: ProgramEntity,
+		programmingLanguage: ProgrammingLanguageEnum,
+		sourceCode: string,
+		version: string,
+	) {
+		this.program = originalProgram;
+		this.programmingLanguage = programmingLanguage;
+		this.sourceCode = sourceCode;
+		this.version = version;
+	}
 }

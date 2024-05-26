@@ -1,0 +1,36 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProgramVersionEntity } from '../entities/program-version.entity';
+import { Repository } from 'typeorm';
+import { CreateVersionDto } from '../dtos/request/create-version.dto';
+import { ProgramEntity } from '../entities/program.entity';
+import { HttpNotFoundException } from '../../../core/exceptions/HttpNotFoundException';
+
+@Injectable()
+export class VersionsService {
+	constructor(
+		@InjectRepository(ProgramVersionEntity)
+		private readonly versionsRepository: Repository<ProgramVersionEntity>,
+
+		@InjectRepository(ProgramEntity)
+		private readonly programRepository: Repository<ProgramEntity>,
+	) {}
+
+	async addNewVersion(createVersionDto: CreateVersionDto): Promise<void> {
+		const originalProgram = await this.programRepository.findOneBy({
+			programId: createVersionDto.programId,
+		});
+		if (!originalProgram) {
+			throw new HttpNotFoundException(
+				"can't create new version original program not found",
+			);
+		}
+		const programVersionEntity = new ProgramVersionEntity(
+			originalProgram,
+			createVersionDto.programmingLanguage,
+			createVersionDto.sourceCode,
+			createVersionDto.version,
+		);
+		await this.versionsRepository.save(programVersionEntity);
+	}
+}
