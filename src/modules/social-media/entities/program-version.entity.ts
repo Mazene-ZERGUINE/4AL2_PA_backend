@@ -1,6 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
 import { ProgramEntity } from './program.entity';
 import { ProgrammingLanguageEnum } from '../enums/programming-language.enum';
+import { VersionsDto } from '../dtos/response/program-version-response.dto';
 
 @Entity('program-version')
 export class ProgramVersionEntity {
@@ -11,7 +12,7 @@ export class ProgramVersionEntity {
 	version: string;
 
 	@Column({ nullable: false, enum: ProgrammingLanguageEnum })
-	programmingLanguage: string;
+	programmingLanguage: ProgrammingLanguageEnum;
 
 	@Column({ nullable: false })
 	sourceCode: string;
@@ -32,5 +33,9 @@ export class ProgramVersionEntity {
 		this.programmingLanguage = programmingLanguage;
 		this.sourceCode = sourceCode;
 		this.version = version;
+	}
+
+	toProgramVersions(): VersionsDto {
+		return new VersionsDto(this);
 	}
 }

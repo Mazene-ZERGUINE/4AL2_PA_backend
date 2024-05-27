@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { CreateVersionDto } from '../dtos/request/create-version.dto';
 import { ProgramEntity } from '../entities/program.entity';
 import { HttpNotFoundException } from '../../../core/exceptions/HttpNotFoundException';
+import { ProgramVersionResponseDto } from '../dtos/response/program-version-response.dto';
 
 @Injectable()
 export class VersionsService {
@@ -32,5 +33,17 @@ export class VersionsService {
 			createVersionDto.version,
 		);
 		await this.versionsRepository.save(programVersionEntity);
+	}
+
+	async getProgramVersion(programId: string): Promise<ProgramVersionResponseDto> {
+		const program = await this.programRepository.findOne({
+			where: { programId: programId },
+			relations: ['versions'],
+		});
+		if (!program) {
+			throw new HttpNotFoundException('program not found');
+		}
+		const versions = program.versions.map((versions) => versions.toProgramVersions());
+		return new ProgramVersionResponseDto(program.toGetProgramDto(), versions);
 	}
 }
