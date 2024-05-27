@@ -1,7 +1,17 @@
-import { Body, Controller, Get, HttpCode, Param, Post, UseGuards } from '@nestjs/common';
+import {
+	Body,
+	Controller,
+	Delete,
+	Get,
+	HttpCode,
+	Param,
+	Post,
+	UseGuards,
+} from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
 	ApiCreatedResponse,
+	ApiNoContentResponse,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiTags,
@@ -9,7 +19,10 @@ import {
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { VersionsService } from '../services/versions.service';
 import { CreateVersionDto } from '../dtos/request/create-version.dto';
-import { ProgramVersionResponseDto } from '../dtos/response/program-version-response.dto';
+import {
+	ProgramVersionResponseDto,
+	VersionsDto,
+} from '../dtos/response/program-version-response.dto';
 
 @ApiTags('versions')
 @Controller('versions')
@@ -44,5 +57,33 @@ export class VersionsController {
 		@Param('programId') programId: string,
 	): Promise<ProgramVersionResponseDto> {
 		return await this.versionsService.getProgramVersion(programId);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('/version/:versionId')
+	@HttpCode(200)
+	@ApiOkResponse({
+		description: 'return the version details with code 200',
+		type: VersionsDto,
+		isArray: false,
+	})
+	@ApiNotFoundResponse({
+		description: 'returns 404 error when version not found',
+	})
+	async getOneByVersion(@Param('versionId') versionId: string): Promise<VersionsDto> {
+		return await this.versionsService.getVersion(versionId);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Delete('/:versionId')
+	@HttpCode(204)
+	@ApiNoContentResponse({
+		description: 'returns 204 code when version is deleted',
+	})
+	@ApiNotFoundResponse({
+		description: 'returns 404 code when not found',
+	})
+	async delete(@Param('versionId') versionId: string): Promise<void> {
+		await this.versionsService.deleteVersion(versionId);
 	}
 }
