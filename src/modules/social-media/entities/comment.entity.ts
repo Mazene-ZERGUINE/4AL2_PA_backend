@@ -25,15 +25,18 @@ export class CommentEntity {
 	@JoinColumn({ name: 'programId' })
 	program: ProgramEntity;
 
-	@Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
-	createdAt: Date;
+	@Column({ nullable: true, type: 'integer' })
+	codeLineNumber: number;
 
 	@ManyToOne(() => CommentEntity, (comment) => comment.replies, { nullable: true })
 	@JoinColumn({ name: 'parentCommentId' })
 	parentComment: CommentEntity;
 
 	@OneToMany(() => CommentEntity, (comment) => comment.parentComment)
-	replies: CommentEntity[];
+	replies?: CommentEntity[];
+
+	@Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
+	createdAt: Date;
 
 	@Column('timestamp', {
 		default: () => 'CURRENT_TIMESTAMP',
