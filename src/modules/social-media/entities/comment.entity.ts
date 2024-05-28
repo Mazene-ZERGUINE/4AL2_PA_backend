@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from './user.entity';
 import { ProgramEntity } from './program.entity';
+import { GetCommentsDto } from '../dtos/response/get-comments.dto';
 
 @Entity('comment')
 export class CommentEntity {
@@ -26,7 +27,7 @@ export class CommentEntity {
 	program: ProgramEntity;
 
 	@Column({ nullable: true, type: 'integer' })
-	codeLineNumber: number;
+	codeLineNumber?: number;
 
 	@ManyToOne(() => CommentEntity, (comment) => comment.replies, { nullable: true })
 	@JoinColumn({ name: 'parentCommentId' })
@@ -43,4 +44,8 @@ export class CommentEntity {
 		onUpdate: 'CURRENT_TIMESTAMP',
 	})
 	updatedAt: Date;
+
+	toGetCommentDto(): GetCommentsDto {
+		return new GetCommentsDto(this);
+	}
 }
