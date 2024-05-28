@@ -1,0 +1,71 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProgramVersionEntity } from '../entities/program-version.entity';
+import { Repository } from 'typeorm';
+import { CreateVersionDto } from '../dtos/request/create-version.dto';
+import { ProgramEntity } from '../entities/program.entity';
+import { HttpNotFoundException } from '../../../core/exceptions/HttpNotFoundException';
+import {
+	ProgramVersionResponseDto,
+	VersionsDto,
+} from '../dtos/response/program-version-response.dto';
+
+@Injectable()
+export class VersionsService {
+	constructor(
+		@InjectRepository(ProgramVersionEntity)
+		private readonly versionsRepository: Repository<ProgramVersionEntity>,
+
+		@InjectRepository(ProgramEntity)
+		private readonly programRepository: Repository<ProgramEntity>,
+	) {}
+
+	async addNewVersion(createVersionDto: CreateVersionDto): Promise<void> {
+		const originalProgram = await this.programRepository.findOneBy({
+			programId: createVersionDto.programId,
+		});
+		if (!originalProgram) {
+			throw new HttpNotFoundException(
+				"can't create new version original program not found",
+			);
+		}
+		const programVersionEntity = new ProgramVersionEntity(
+			originalProgram,
+			createVersionDto.programmingLanguage,
+			createVersionDto.sourceCode,
+			createVersionDto.version,
+		);
+		await this.versionsRepository.save(programVersionEntity);
+	}
+
+	async getProgramVersion(programId: string): Promise<ProgramVersionResponseDto> {
+		const program = await this.programRepository.findOne({
+			where: { programId: programId },
+			relations: ['versions'],
+		});
+		if (!program) {
+			throw new HttpNotFoundException('program not found');
+		}
+		const versions = program.versions.map((versions) => versions.toProgramVersions());
+		return new ProgramVersionResponseDto(program.toGetProgramDto(), versions);
+	}
+
+	async getVersion(programVersion: string): Promise<VersionsDto | undefined> {
+		try {
+			const version = await this.versionsRepository.findOneOrFail({
+				where: { programVersionId: programVersion },
+			});
+			return version.toProgramVersions();
+		} catch (error: unknown) {
+			throw new HttpNotFoundException('version not found');
+		}
+	}
+
+	async deleteVersion(versionId: string): Promise<void> {
+		try {
+			await this.versionsRepository.delete(versionId);
+		} catch (error: unknown) {
+			throw new HttpNotFoundException('version not found');
+		}
+	}
+}

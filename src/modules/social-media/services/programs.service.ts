@@ -8,6 +8,8 @@ import { ProgramVisibilityEnum } from '../enums/program-visibility.enum';
 import { GetProgramDto } from '../dtos/response/get-program.dto';
 import { UsersService } from './users.service';
 import { HttpNotFoundException } from '../../../core/exceptions/HttpNotFoundException';
+import { ProgramPartialUpdateDto } from '../dtos/request/program-partial-update.dto';
+import { merge } from 'lodash';
 
 @Injectable()
 export class ProgramsService {
@@ -53,5 +55,32 @@ export class ProgramsService {
 			relations: ['user'],
 		});
 		return userPrograms.map((program) => program.toGetProgramDto());
+	}
+
+	async editProgram(programId: string, editDto: CreateProgramDto): Promise<void> {
+		const program = await this.programRepository.findOneBy({ programId: programId });
+		if (!program) {
+			throw new HttpNotFoundException('program not found');
+		}
+		Object.assign(program, editDto);
+		await this.programRepository.save(program);
+	}
+
+	async programPartialUpdate(
+		updateDto: ProgramPartialUpdateDto,
+		programId: string,
+	): Promise<void> {
+		const program = await this.programRepository.findOneBy({ programId: programId });
+		if (!program) {
+			throw new HttpNotFoundException('programNot found');
+		}
+		merge(program, updateDto);
+		program.inputTypes = updateDto.inputTypes;
+		program.outputTypes = updateDto.outputTypes;
+		await this.programRepository.save(program);
+	}
+
+	async deleteProgram(programId: string): Promise<void> {
+		await this.programRepository.delete(programId);
 	}
 }
