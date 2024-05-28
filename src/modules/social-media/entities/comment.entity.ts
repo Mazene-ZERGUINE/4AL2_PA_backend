@@ -1,4 +1,11 @@
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {
+	Entity,
+	PrimaryGeneratedColumn,
+	Column,
+	ManyToOne,
+	JoinColumn,
+	OneToMany,
+} from 'typeorm';
 import { UserEntity } from './user.entity';
 import { ProgramEntity } from './program.entity';
 
@@ -20,6 +27,13 @@ export class CommentEntity {
 
 	@Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
 	createdAt: Date;
+
+	@ManyToOne(() => CommentEntity, (comment) => comment.replies, { nullable: true })
+	@JoinColumn({ name: 'parentCommentId' })
+	parentComment: CommentEntity;
+
+	@OneToMany(() => CommentEntity, (comment) => comment.parentComment)
+	replies: CommentEntity[];
 
 	@Column('timestamp', {
 		default: () => 'CURRENT_TIMESTAMP',
