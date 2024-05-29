@@ -1,15 +1,18 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import { corsConfig } from './core/config/cors.config';
+import { createCorsConfig } from './core/config/cors.config';
 import { validationPipeOptions } from './core/config/validation-pipe.config';
 import { GlobalExceptionHandler } from './core/middleware/GlobalExceptionHandler';
 import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
 
 (async function bootstrap(): Promise<void> {
 	const app = await NestFactory.create(AppModule);
+	const configService = app.get(ConfigService);
+
 	app.setGlobalPrefix('api/v1');
-	app.enableCors(corsConfig);
+	app.enableCors(createCorsConfig(configService));
 	app.useGlobalPipes(new ValidationPipe(validationPipeOptions));
 	app.useGlobalFilters(new GlobalExceptionHandler());
 
@@ -17,9 +20,7 @@ import { DocumentBuilder, SwaggerDocumentOptions, SwaggerModule } from '@nestjs/
 
 	await app.listen(3000);
 })()
-	// eslint-disable-next-line no-console
 	.then(() => console.log('🚀 Server is running'))
-	// eslint-disable-next-line no-console
 	.catch((error) => console.error('❌ Error starting server', error));
 
 function addSwagger(app: INestApplication): void {
