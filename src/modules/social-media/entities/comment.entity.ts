@@ -29,11 +29,16 @@ export class CommentEntity {
 	@Column({ nullable: true, type: 'integer' })
 	codeLineNumber?: number;
 
-	@ManyToOne(() => CommentEntity, (comment) => comment.replies, { nullable: true })
+	@ManyToOne(() => CommentEntity, (comment) => comment.replies, {
+		nullable: true,
+		onDelete: 'CASCADE',
+	})
 	@JoinColumn({ name: 'parentCommentId' })
 	parentComment: CommentEntity;
 
-	@OneToMany(() => CommentEntity, (comment) => comment.parentComment)
+	@OneToMany(() => CommentEntity, (comment) => comment.parentComment, {
+		cascade: ['insert', 'update', 'remove'],
+	})
 	replies?: CommentEntity[];
 
 	@Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })

@@ -49,8 +49,8 @@ export class GetCommentsDto {
 	constructor(entity: CommentEntity) {
 		this.commentId = entity.commentId;
 		this.content = entity.content;
-		this.program = entity.program.toGetProgramDto();
-		this.replies = entity.replies.map((reply) => reply.toGetCommentDto());
+		if (entity.replies)
+			this.replies = entity?.replies.map((reply) => reply?.toGetCommentDto());
 		this.user = entity.user.toUserDataDto();
 		this.createdAt = entity.createdAt;
 		this.updatedAt = entity.updatedAt;

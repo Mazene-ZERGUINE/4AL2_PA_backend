@@ -55,12 +55,11 @@ export class CommentsService {
 	async getAllProgramComments(programId: string): Promise<GetCommentsDto[]> {
 		try {
 			const comments = await this.commentsRepository.find({
-				where: { program: { programId } },
+				where: { program: { programId: programId } },
 				relations: ['user', 'replies', 'replies.user'],
 				order: { createdAt: 'ASC' },
 			});
-
-			return comments.map((comment: CommentEntity) => comment.toGetCommentDto());
+			return comments.map((comment: CommentEntity) => comment?.toGetCommentDto());
 		} catch (error: unknown) {
 			throw new InternalServerErrorException(`internal server error ${error}`);
 		}
@@ -68,11 +67,14 @@ export class CommentsService {
 
 	async respondToComment(commentId: string, commentDto: CreateCommentDto): Promise<void> {
 		try {
-			const commentEntity = await this.commentsRepository.findOneByOrFail({
-				commentId: commentId,
+			const commentEntity = await this.commentsRepository.findOneOrFail({
+				where: { commentId },
+				relations: ['replies'],
 			});
 			const replyEntity = await this.createCommentEntity(commentDto);
+			replyEntity.parentComment = commentEntity;
 			commentEntity.replies.push(replyEntity);
+			await this.commentsRepository.save(replyEntity);
 			await this.commentsRepository.save(commentEntity);
 		} catch (error: unknown) {
 			if (error instanceof EntityNotFoundError)
@@ -80,7 +82,6 @@ export class CommentsService {
 			else throw new InternalServerErrorException(`internal server error ${error}`);
 		}
 	}
-
 	private async createCommentEntity(
 		commentDto: CreateCommentDto,
 	): Promise<CommentEntity> {

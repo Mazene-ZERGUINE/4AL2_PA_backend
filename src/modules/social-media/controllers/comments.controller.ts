@@ -59,7 +59,7 @@ export class CommentsController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Delete('/:programId')
+	@Delete('/:commentId')
 	@HttpCode(204)
 	@ApiNoContentResponse()
 	@ApiNotFoundResponse()
