@@ -7,6 +7,7 @@ import { CreateCommentDto } from '../dtos/request/create-comment.dto';
 import { UserEntity } from '../entities/user.entity';
 import { HttpNotFoundException } from '../../../core/exceptions/HttpNotFoundException';
 import { EditCommentDto } from '../dtos/request/edit-comment.dto';
+import { GetCommentsDto } from '../dtos/response/get-comments.dto';
 
 @Injectable()
 export class CommentsService {
@@ -21,17 +22,7 @@ export class CommentsService {
 
 	async saveComment(commentDto: CreateCommentDto): Promise<void> {
 		try {
-			const userRef = await this.userRepository.findOneByOrFail({
-				userId: commentDto.userId,
-			});
-			const programRef = await this.programsRepository.findOneByOrFail({
-				programId: commentDto.programId,
-			});
-			const commentEntity = this.commentsRepository.create({
-				...commentDto,
-				user: userRef,
-				program: programRef,
-			});
+			const commentEntity = await this.createCommentEntity(commentDto);
 			await this.commentsRepository.save(commentEntity);
 		} catch (error: unknown) {
 			throw new InternalServerErrorException(`internal server error ${error}`);
@@ -61,9 +52,49 @@ export class CommentsService {
 		}
 	}
 
-	// todo
-	async getCommentResponses(): Promise<void> {}
+	async getAllProgramComments(programId: string): Promise<GetCommentsDto[]> {
+		try {
+			const comments = await this.commentsRepository.find({
+				where: { program: { programId } },
+				relations: ['user', 'replies', 'replies.user'],
+				order: { createdAt: 'ASC' },
+			});
 
-	// todo
-	async respondToComment(): Promise<void> {}
+			return comments.map((comment: CommentEntity) => comment.toGetCommentDto());
+		} catch (error: unknown) {
+			throw new InternalServerErrorException(`internal server error ${error}`);
+		}
+	}
+
+	async respondToComment(commentId: string, commentDto: CreateCommentDto): Promise<void> {
+		try {
+			const commentEntity = await this.commentsRepository.findOneByOrFail({
+				commentId: commentId,
+			});
+			const replyEntity = await this.createCommentEntity(commentDto);
+			commentEntity.replies.push(replyEntity);
+			await this.commentsRepository.save(commentEntity);
+		} catch (error: unknown) {
+			if (error instanceof EntityNotFoundError)
+				throw new HttpNotFoundException('comment not found');
+			else throw new InternalServerErrorException(`internal server error ${error}`);
+		}
+	}
+
+	private async createCommentEntity(
+		commentDto: CreateCommentDto,
+	): Promise<CommentEntity> {
+		const userRef = await this.userRepository.findOneByOrFail({
+			userId: commentDto.userId,
+		});
+		const programRef = await this.programsRepository.findOneByOrFail({
+			programId: commentDto.programId,
+		});
+		const commentEntity = this.commentsRepository.create({
+			...commentDto,
+			user: userRef,
+			program: programRef,
+		});
+		return commentEntity;
+	}
 }

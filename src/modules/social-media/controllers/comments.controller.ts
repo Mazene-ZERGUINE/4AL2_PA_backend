@@ -2,14 +2,18 @@ import {
 	BadRequestException,
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpCode,
+	Param,
+	Patch,
 	Post,
 	UseGuards,
 } from '@nestjs/common';
 import {
 	ApiBadRequestResponse,
 	ApiCreatedResponse,
+	ApiNoContentResponse,
 	ApiNotFoundResponse,
 	ApiOkResponse,
 	ApiTags,
@@ -18,6 +22,7 @@ import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { CreateCommentDto } from '../dtos/request/create-comment.dto';
 import { CommentsService } from '../services/comments.service';
 import { GetCommentsDto } from '../dtos/response/get-comments.dto';
+import { EditCommentDto } from '../dtos/request/edit-comment.dto';
 
 @ApiTags('comments')
 @Controller('comment')
@@ -39,18 +44,51 @@ export class CommentsController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Get('')
+	@Get('/:programId')
 	@HttpCode(200)
 	@ApiOkResponse({
-		description: 'returns a list of comments and thier responses when',
+		description: 'returns a list of program comments and their responses when found',
 		isArray: true,
 		type: GetCommentsDto,
 	})
 	@ApiNotFoundResponse({
-		description: 'returns http 404 code when comment not foudn',
+		description: 'returns http 404 code when comment not found',
 	})
-	async getAll(): Promise<void> {
-		//todo
-		//return await this.commentService.getCommentResponses(commentId);
+	async getAll(@Param('programId') programId: string): Promise<GetCommentsDto[]> {
+		return await this.commentService.getAllProgramComments(programId);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Delete('/:programId')
+	@HttpCode(204)
+	@ApiNoContentResponse()
+	@ApiNotFoundResponse()
+	private async delete(@Param('commentId') commentId: string): Promise<void> {
+		await this.commentService.deleteComment(commentId);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Patch('/:commentId')
+	@HttpCode(200)
+	@ApiOkResponse()
+	@ApiNotFoundResponse()
+	private async partialUpdate(
+		@Param('commentId') commentId: string,
+		payload: EditCommentDto,
+	): Promise<void> {
+		await this.commentService.editComment(commentId, payload);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Post('/respond/:commentId')
+	@HttpCode(200)
+	@ApiOkResponse()
+	@ApiBadRequestResponse()
+	@ApiNotFoundResponse()
+	private async replyToComment(
+		@Param('commentId') commentId: string,
+		@Body() payload: CreateCommentDto,
+	): Promise<void> {
+		await this.commentService.respondToComment(commentId, payload);
 	}
 }
