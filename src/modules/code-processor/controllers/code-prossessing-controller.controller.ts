@@ -4,7 +4,9 @@ import { CodeProcessorService } from '../services/code-processor.service';
 import { CodeResultsResponseDto } from '../dtos/response/code-results-response.dto';
 import { ApiBadRequestResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
+@UseGuards(ThrottlerGuard)
 @Controller('/code-processor')
 @ApiTags('Code processor')
 export class CodeProcessingControllerController {
