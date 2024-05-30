@@ -9,7 +9,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
 
-async function bootstrap() {
+async function bootstrap(): Promise<void> {
 	const app = await NestFactory.create(AppModule);
 	const configService = app.get(ConfigService);
 

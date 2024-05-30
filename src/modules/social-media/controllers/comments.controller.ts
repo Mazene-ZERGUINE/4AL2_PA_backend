@@ -81,8 +81,8 @@ export class CommentsController {
 
 	@UseGuards(JwtAuthGuard)
 	@Post('/respond/:commentId')
-	@HttpCode(200)
-	@ApiOkResponse()
+	@HttpCode(201)
+	@ApiCreatedResponse()
 	@ApiBadRequestResponse()
 	@ApiNotFoundResponse()
 	private async replyToComment(

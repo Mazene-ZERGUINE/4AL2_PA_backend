@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 
 @Catch(ThrottlerException)
 export class CustomThrottlerExceptionFilter implements ExceptionFilter {
-	catch(exception: ThrottlerException, host: ArgumentsHost) {
+	catch(exception: ThrottlerException, host: ArgumentsHost): void {
 		const ctx = host.switchToHttp();
 		const response = ctx.getResponse<Response>();
 		const request = ctx.getRequest<Request>();

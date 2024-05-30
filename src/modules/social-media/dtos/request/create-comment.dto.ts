@@ -17,7 +17,7 @@ export class CreateCommentDto {
 	})
 	@IsString()
 	@IsNotEmpty()
-	@Length(0, 255)
+	@Length(1, 255)
 	content: string;
 
 	@ApiProperty({
