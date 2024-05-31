@@ -9,6 +9,8 @@ import { CodeProcessorModule } from './modules/code-processor/code-processor.mod
 import { SocialMediaModule } from './modules/social-media/social-media.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { throttlerConfig } from './core/config/throttler.config';
 
 @Module({
 	imports: [
@@ -28,6 +30,11 @@ import { join } from 'path';
 		ServeStaticModule.forRoot({
 			rootPath: join(__dirname, '..', 'uploads', 'avatars'),
 			serveRoot: '/uploads/avatars',
+		}),
+		ThrottlerModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: throttlerConfig,
 		}),
 	],
 })

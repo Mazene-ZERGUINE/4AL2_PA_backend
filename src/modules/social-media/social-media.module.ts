@@ -9,9 +9,12 @@ import { UsersController } from './controllers/users.controller';
 import { FollowController } from './controllers/follow.controller';
 import { FollowService } from './services/follow.service';
 import { FollowEntity } from './entities/follow.entity';
-import { VersionsService } from './services/versions.service';
-import { VersionsController } from './controllers/versions.controller';
+import { CommentsController } from './controllers/comments.controller';
+import { CommentEntity } from './entities/comment.entity';
+import { CommentsService } from './services/comments.service';
 import { ProgramVersionEntity } from './entities/program-version.entity';
+import { VersionsController } from './controllers/versions.controller';
+import { VersionsService } from './services/versions.service';
 
 @Module({
 	imports: [
@@ -19,11 +22,24 @@ import { ProgramVersionEntity } from './entities/program-version.entity';
 			UserEntity,
 			ProgramEntity,
 			FollowEntity,
+			CommentEntity,
 			ProgramVersionEntity,
 		]),
 	],
 	exports: [UsersService, TypeOrmModule, ProgramsService],
-	providers: [UsersService, ProgramsService, FollowService, VersionsService],
-	controllers: [ProgramController, UsersController, FollowController, VersionsController],
+	providers: [
+		UsersService,
+		ProgramsService,
+		FollowService,
+		CommentsService,
+		VersionsService,
+	],
+	controllers: [
+		ProgramController,
+		UsersController,
+		FollowController,
+		CommentsController,
+		VersionsController,
+	],
 })
 export class SocialMediaModule {}

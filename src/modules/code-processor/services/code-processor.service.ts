@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from './http.service';
-import { CodeResultsResponseDto } from '../dtos/response/CodeResultsResponseDto';
-import { CodeExecutedResponse } from '../dtos/response/CodeExecutedResponse';
+import { CodeResultsResponseDto } from '../dtos/response/code-results-response.dto';
+import { CodeExecutedResponseDto } from '../dtos/response/code-executed-response.dto';
 import { ProgrammingLanguage } from '../enums/ProgrammingLanguage';
 import { TimeoutException } from '../../../core/exceptions/TimeoutException';
 
@@ -17,7 +17,10 @@ export class CodeProcessorService {
 			programming_language: programmingLanguage,
 			source_code: sourceCode,
 		};
-		const response: CodeExecutedResponse = await this.httpService.post('execute/', data);
+		const response: CodeExecutedResponseDto = await this.httpService.post(
+			'execute/',
+			data,
+		);
 		const taskResult = await this.checkTaskStatus(response.task_id);
 		return taskResult;
 	}
