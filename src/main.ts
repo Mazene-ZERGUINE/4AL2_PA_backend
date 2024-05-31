@@ -34,5 +34,7 @@ async function bootstrap(): Promise<void> {
 }
 
 bootstrap()
+	// eslint-disable-next-line no-console
 	.then(() => console.log('🚀 Server is running'))
+	// eslint-disable-next-line no-console
 	.catch((error) => console.error('❌ Error starting server', error));
