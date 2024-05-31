@@ -20,7 +20,11 @@ async function bootstrap(): Promise<void> {
 		new GlobalExceptionHandler(),
 		new CustomThrottlerExceptionFilter(),
 	);
-	app.use(helmet());
+	app.use(
+		helmet({
+			crossOriginResourcePolicy: { policy: 'cross-origin' },
+		}),
+	);
 
 	const config = new DocumentBuilder()
 		.setTitle('Esgithub')
