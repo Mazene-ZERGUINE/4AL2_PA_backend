@@ -71,6 +71,7 @@ export class CodeProcessorService {
 				output_file_path: files.outputFilePath,
 			},
 			programming_language: processFileDto.programmingLanguage,
+			file_output_fromat: processFileDto.outputFormat,
 		};
 		const response: CodeExecutedResponseDto = await this.httpService.post(
 			'file/execute',

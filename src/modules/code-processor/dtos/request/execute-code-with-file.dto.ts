@@ -34,4 +34,8 @@ export class ExecuteCodeWithFileDto {
 	@IsEnum(FileTypesEnum)
 	@IsNotEmpty()
 	file_paths: FilePaths;
+
+	@IsString()
+	@IsNotEmpty()
+	file_output_fromat: string;
 }
