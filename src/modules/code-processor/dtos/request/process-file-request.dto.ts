@@ -16,12 +16,14 @@ export class ProcessFileRequestDto {
 	@ApiProperty({
 		description: 'source code',
 		type: String,
+		example: 'console.log("ok")',
 	})
 	@IsString()
 	@IsNotEmpty()
 	readonly sourceCode: string;
 
 	@ApiProperty({
+		description: 'file format to save the file',
 		example: 'json',
 		enum: FileTypesEnum,
 	})

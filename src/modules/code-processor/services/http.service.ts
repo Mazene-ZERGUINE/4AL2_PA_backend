@@ -30,6 +30,11 @@ export class HttpService {
 		return response.data;
 	}
 
+	async delete<T>(url: string): Promise<T> {
+		const response = (await this.axiosInstance.delete(url)) as AxiosResponse<T>;
+		return response.data;
+	}
+
 	async downloadFile(fileUrl: string, outputDir: string): Promise<string> {
 		const outputFilePath = path.join(outputDir, path.basename(fileUrl));
 		const writer = fs.createWriteStream(outputFilePath);

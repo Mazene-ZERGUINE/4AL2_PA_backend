@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HttpService } from './http.service';
 import { CodeResultsResponseDto } from '../dtos/response/code-results-response.dto';
 import { CodeExecutedResponseDto } from '../dtos/response/code-executed-response.dto';
@@ -10,17 +10,27 @@ import { Express } from 'express';
 import { ExecuteCodeWithFileDto } from '../dtos/request/execute-code-with-file.dto';
 import { CodeWithFileExecutedResponseDto } from '../dtos/response/code-with-file-executed-response.dto';
 import { join } from 'path';
+import { FilesHandlerUtils } from '../utils/files-handler.utils';
+import * as path from 'node:path';
 
 @Injectable()
 export class CodeProcessorService {
 	private readonly codeInputPath: string;
 	private readonly codeOutputPath: string;
+	private inputFileUploadPath: string;
 	private readonly outpuUploadPath = join(
 		__dirname,
 		'../../../../',
 		'uploads',
 		'code',
 		'output',
+	);
+	private readonly inputUploadPath = path.join(
+		__dirname,
+		'../../../../',
+		'uploads',
+		'code',
+		'input',
 	);
 
 	constructor(private httpService: HttpService, configService: ConfigService) {
@@ -44,6 +54,75 @@ export class CodeProcessorService {
 		return taskResult as CodeResultsResponseDto;
 	}
 
+	async runCodeWithFile(
+		file: Express.Multer.File,
+		processFileDto: ProcessFileRequestDto,
+	): Promise<any> {
+		try {
+			const { inputFilePath, outputFilePath } = FilesHandlerUtils.processFilePath(
+				file.filename,
+				this.codeInputPath,
+				this.codeOutputPath,
+			);
+			this.inputFileUploadPath = this.inputUploadPath + '/' + file.filename;
+			const payload: ExecuteCodeWithFileDto = {
+				source_code: processFileDto.sourceCode,
+				file_paths: {
+					input_file_path: inputFilePath,
+					output_file_path: outputFilePath,
+				},
+				programming_language: processFileDto.programmingLanguage,
+				file_output_fromat: processFileDto.outputFormat,
+			};
+
+			const response: CodeExecutedResponseDto = await this.httpService.post(
+				'file/execute',
+				payload,
+			);
+
+			if (!response.task_id) {
+				throw new InternalServerErrorException(
+					'Failed to create celery task to execute the code',
+				);
+			}
+
+			const taskResult: CodeWithFileExecutedResponseDto = (await this.checkTaskStatus(
+				response.task_id,
+			)) as CodeWithFileExecutedResponseDto;
+
+			if (taskResult.result.stderr || !taskResult.result.output_file_path) {
+				return taskResult;
+			}
+
+			let newFilePath = await this.httpService.downloadFile(
+				taskResult.result.output_file_path,
+				this.outpuUploadPath,
+			);
+
+			if (!newFilePath) {
+				throw new InternalServerErrorException('Failed to download output result file');
+			}
+
+			const pathSegments = newFilePath.split('/');
+			const newFileName = pathSegments[pathSegments.length - 1];
+			newFilePath = `${this.codeOutputPath}/${newFileName}`;
+
+			const deleteFileUrl = `file/delete?file=${newFileName}`;
+			const deleteResult = await this.httpService.delete<{
+				status: number;
+				success: boolean;
+			}>(deleteFileUrl);
+			if (deleteResult.status !== 200 || !deleteResult.success) {
+				throw new InternalServerErrorException('Failed to delete the file');
+			}
+
+			taskResult.result.output_file_path = newFilePath;
+			return taskResult;
+		} finally {
+			FilesHandlerUtils.removeTmpFiles(this.inputFileUploadPath);
+		}
+	}
+
 	async checkTaskStatus(
 		taskId: string,
 	): Promise<CodeResultsResponseDto | CodeWithFileExecutedResponseDto> {
@@ -57,51 +136,5 @@ export class CodeProcessorService {
 			await new Promise((resolve) => setTimeout(resolve, 2000));
 		}
 		throw new TimeoutException('request timeout');
-	}
-
-	async runCodeWithFile(
-		file: Express.Multer.File,
-		processFileDto: ProcessFileRequestDto,
-	): Promise<any> {
-		const files = this.processFilePath(file.filename);
-		const payload: ExecuteCodeWithFileDto = {
-			source_code: processFileDto.sourceCode,
-			file_paths: {
-				input_file_path: files.inputFilePath,
-				output_file_path: files.outputFilePath,
-			},
-			programming_language: processFileDto.programmingLanguage,
-			file_output_fromat: processFileDto.outputFormat,
-		};
-		const response: CodeExecutedResponseDto = await this.httpService.post(
-			'file/execute',
-			payload,
-		);
-		const taskResult: CodeWithFileExecutedResponseDto = (await this.checkTaskStatus(
-			response.task_id,
-		)) as CodeWithFileExecutedResponseDto;
-
-		if (taskResult.result.stderr || taskResult.result.output_file_path === null) {
-			return taskResult;
-		}
-
-		let newFilePath = await this.httpService.downloadFile(
-			taskResult.result.output_file_path,
-			this.outpuUploadPath,
-		);
-		const pathSegments = newFilePath.split('/');
-		newFilePath = `${this.codeOutputPath}/${pathSegments[pathSegments.length - 1]}`;
-		taskResult.result.output_file_path = newFilePath;
-		return taskResult;
-	}
-
-	private processFilePath(fileName: string): {
-		inputFilePath: string;
-		outputFilePath: string;
-	} {
-		return {
-			inputFilePath: this.codeInputPath + '/' + fileName,
-			outputFilePath: this.codeOutputPath + '/' + fileName,
-		};
 	}
 }
