@@ -1,14 +1,9 @@
-import { Response } from 'express';
 import {
 	BadRequestException,
 	Body,
 	Controller,
-	Get,
 	HttpCode,
-	InternalServerErrorException,
 	Post,
-	Query,
-	Res,
 	UploadedFile,
 	UseGuards,
 	UseInterceptors,
@@ -19,7 +14,6 @@ import { CodeResultsResponseDto } from '../dtos/response/code-results-response.d
 import {
 	ApiBadRequestResponse,
 	ApiConsumes,
-	ApiInternalServerErrorResponse,
 	ApiOkResponse,
 	ApiTags,
 } from '@nestjs/swagger';
@@ -29,9 +23,6 @@ import { codeExecutionsMulterOption } from '../../../core/middleware/multer.conf
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ProcessFileRequestDto } from '../dtos/request/process-file-request.dto';
 import { Express } from 'express';
-import { FilesHandlerUtils } from '../utils/files-handler.utils';
-import * as path from 'node:path';
-import * as fs from 'node:fs';
 
 @UseGuards(ThrottlerGuard)
 @Controller('/code-processor')
@@ -58,7 +49,8 @@ export class CodeProcessingControllerController {
 		);
 	}
 
-	//@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard)
+	@UseGuards(ThrottlerGuard)
 	@Post('file/run-code')
 	@HttpCode(200)
 	@ApiOkResponse({
@@ -73,42 +65,12 @@ export class CodeProcessingControllerController {
 	})
 	@UseInterceptors(FileInterceptor('file', codeExecutionsMulterOption))
 	@ApiConsumes('multipart/form-data')
-	async executeCodeWithFile(
+	async processCodeWithFile(
 		@Body() payload: ProcessFileRequestDto,
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<any> {
 		if (file === undefined && file === null)
 			throw new BadRequestException('no file was provided');
 		return await this.codeProcessorService.runCodeWithFile(file, payload);
-	}
-
-	@UseGuards(ThrottlerGuard)
-	//@UseGuards(JwtAuthGuard)
-	@Get('/file/output-file')
-	@HttpCode(200)
-	@ApiOkResponse({
-		description: 'download the output file and return 200 http status',
-	})
-	@ApiInternalServerErrorResponse({
-		description:
-			'return 500 http error whene erroer occure while downloading the output file',
-	})
-	async downloadOutputFile(
-		@Query('filepath') filePath: string,
-		@Res() response: Response,
-	): Promise<void> {
-		if (FilesHandlerUtils.checkFileIfExists(filePath)) {
-			throw new InternalServerErrorException('file path does not exist');
-		}
-		try {
-			response.setHeader(
-				'Content-Disposition',
-				`attachment; filename=${path.basename(filePath)}`,
-			);
-			const fileStream = fs.createReadStream(filePath);
-			fileStream.pipe(response);
-		} catch (error) {
-			throw new InternalServerErrorException('Failed to download the file');
-		}
 	}
 }
