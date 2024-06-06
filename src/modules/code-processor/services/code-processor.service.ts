@@ -79,7 +79,6 @@ export class CodeProcessorService {
 				'file/execute',
 				payload,
 			);
-
 			if (!response.task_id) {
 				throw new InternalServerErrorException(
 					'Failed to create celery task to execute the code',
@@ -89,7 +88,6 @@ export class CodeProcessorService {
 			const taskResult: CodeWithFileExecutedResponseDto = (await this.checkTaskStatus(
 				response.task_id,
 			)) as CodeWithFileExecutedResponseDto;
-
 			if (taskResult.result.stderr || !taskResult.result.output_file_path) {
 				return taskResult;
 			}
@@ -98,7 +96,6 @@ export class CodeProcessorService {
 				taskResult.result.output_file_path,
 				this.outpuUploadPath,
 			);
-
 			if (!newFilePath) {
 				throw new InternalServerErrorException('Failed to download output result file');
 			}
@@ -106,7 +103,6 @@ export class CodeProcessorService {
 			const pathSegments = newFilePath.split('/');
 			const newFileName = pathSegments[pathSegments.length - 1];
 			newFilePath = `${this.codeOutputPath}/${newFileName}`;
-
 			const deleteFileUrl = `file/delete?file=${newFileName}`;
 			const deleteResult = await this.httpService.delete<{
 				status: number;
@@ -115,18 +111,20 @@ export class CodeProcessorService {
 			if (deleteResult.status !== 200 || !deleteResult.success) {
 				throw new InternalServerErrorException('Failed to delete the file');
 			}
-
 			taskResult.result.output_file_path = newFilePath;
+
 			return taskResult;
+		} catch (error: unknown) {
+			throw new InternalServerErrorException(error);
 		} finally {
 			FilesHandlerUtils.removeTmpFiles(this.inputFileUploadPath);
 		}
 	}
 
-	async checkTaskStatus(
+	private async checkTaskStatus(
 		taskId: string,
 	): Promise<CodeResultsResponseDto | CodeWithFileExecutedResponseDto> {
-		for (let i = 0; i < 2; i++) {
+		for (let i = 0; i < 5; i++) {
 			const taskResult = await this.httpService.get<CodeResultsResponseDto>(
 				`result/${taskId}`,
 			);

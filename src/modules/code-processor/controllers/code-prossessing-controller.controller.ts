@@ -30,7 +30,7 @@ import { Express } from 'express';
 export class CodeProcessingControllerController {
 	constructor(private readonly codeProcessorService: CodeProcessorService) {}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, JwtAuthGuard)
 	@Post('/run-code')
 	@HttpCode(200)
 	@ApiOkResponse({
@@ -49,8 +49,7 @@ export class CodeProcessingControllerController {
 		);
 	}
 
-	@UseGuards(JwtAuthGuard)
-	@UseGuards(ThrottlerGuard)
+	@UseGuards(JwtAuthGuard, ThrottlerGuard)
 	@Post('file/run-code')
 	@HttpCode(200)
 	@ApiOkResponse({
@@ -69,8 +68,7 @@ export class CodeProcessingControllerController {
 		@Body() payload: ProcessFileRequestDto,
 		@UploadedFile() file: Express.Multer.File,
 	): Promise<any> {
-		if (file === undefined && file === null)
-			throw new BadRequestException('no file was provided');
+		if (!file) throw new BadRequestException('no file was provided');
 		return await this.codeProcessorService.runCodeWithFile(file, payload);
 	}
 }
