@@ -27,3 +27,17 @@ export const multerOptions = {
 		cb(null, true);
 	},
 };
+
+export const codeExecutionsMulterOption = {
+	storage: diskStorage({
+		destination: (req, file, cb) => {
+			const uploadPath = join(__dirname, '../../../', 'uploads', 'code', 'input');
+			cb(null, uploadPath);
+		},
+		filename: (req, file, cb) => {
+			const fileExtName = extname(file.originalname);
+			const randomName = uuidv4();
+			cb(null, `${randomName}${fileExtName}`);
+		},
+	}),
+};

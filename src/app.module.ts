@@ -7,10 +7,25 @@ import { CoreModule } from './core/core.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { CodeProcessorModule } from './modules/code-processor/code-processor.module';
 import { SocialMediaModule } from './modules/social-media/social-media.module';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { throttlerConfig } from './core/config/throttler.config';
+import { ServeStaticModule, ServeStaticModuleOptions } from '@nestjs/serve-static';
+import { join } from 'path';
+
+const serveStaticOptions: ServeStaticModuleOptions[] = [
+	{
+		rootPath: join(__dirname, '..', 'uploads', 'avatars'),
+		serveRoot: '/uploads/avatars',
+	},
+	{
+		rootPath: join(__dirname, '..', 'uploads', 'code', 'input'),
+		serveRoot: '/uploads/code/input',
+	},
+	{
+		rootPath: join(__dirname, '..', 'uploads', 'code', 'output'),
+		serveRoot: '/uploads/code/output',
+	},
+];
 
 @Module({
 	imports: [
@@ -27,10 +42,7 @@ import { throttlerConfig } from './core/config/throttler.config';
 			inject: [ConfigService],
 			useFactory: createTypeOrmConfig,
 		}),
-		ServeStaticModule.forRoot({
-			rootPath: join(__dirname, '..', 'uploads', 'avatars'),
-			serveRoot: '/uploads/avatars',
-		}),
+		ServeStaticModule.forRoot(...serveStaticOptions),
 		ThrottlerModule.forRootAsync({
 			imports: [ConfigModule],
 			inject: [ConfigService],
