@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProgrammingLanguage } from '../../enums/ProgrammingLanguage';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { FileTypesEnum } from '../../../social-media/enums/file-types.enum';
 
 export class ProcessFileRequestDto {
@@ -23,11 +23,12 @@ export class ProcessFileRequestDto {
 	readonly sourceCode: string;
 
 	@ApiProperty({
-		description: 'file format to save the file',
-		example: 'json',
-		enum: FileTypesEnum,
+		description: 'output files formats',
+		type: [String],
+		isArray: true,
 	})
+	@IsArray()
+	@IsEnum(FileTypesEnum, { each: true })
 	@IsNotEmpty()
-	@IsEnum(FileTypesEnum)
-	readonly outputFormat: FileTypesEnum;
+	outputFilesFormats: FileTypesEnum[];
 }

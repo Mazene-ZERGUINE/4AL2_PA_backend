@@ -3,10 +3,18 @@ import axios, { AxiosResponse } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
+import { join } from 'path';
 
 @Injectable()
 export class HttpService {
 	private readonly axiosInstance;
+	private readonly outputDir = join(
+		__dirname,
+		'../../../../',
+		'uploads',
+		'code',
+		'output',
+	);
 
 	constructor(private configService: ConfigService) {
 		this.axiosInstance = axios.create({
@@ -35,8 +43,8 @@ export class HttpService {
 		return response.data;
 	}
 
-	async downloadFile(fileUrl: string, outputDir: string): Promise<string> {
-		const outputFilePath = path.join(outputDir, path.basename(fileUrl));
+	async downloadFile(fileUrl: string): Promise<string> {
+		const outputFilePath = path.join(this.outputDir, path.basename(fileUrl));
 		const writer = fs.createWriteStream(outputFilePath);
 		try {
 			const response = await this.axiosInstance.get(fileUrl, {
