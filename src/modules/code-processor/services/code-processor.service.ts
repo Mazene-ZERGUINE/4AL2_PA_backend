@@ -105,9 +105,6 @@ export class CodeProcessorService {
 	private validateTaskResult(
 		taskResult: CodeWithFileExecutedResponseDto,
 	): CodeWithFileExecutedResponseDto {
-		if (taskResult.result.stderr !== '') {
-			console.log('error encountered stderr: ', taskResult.result.stderr);
-		}
 		return taskResult;
 	}
 

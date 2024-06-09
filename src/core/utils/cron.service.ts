@@ -7,7 +7,7 @@ import { join } from 'path';
 @Injectable()
 export class CronService {
 	@Cron('0 0 */5 * * *') // Runs every 5 hours
-	handleCron() {
+	handleCron(): void {
 		const inputDir = join(__dirname, '../../../', 'uploads', 'code', 'input');
 		const outputDir = join(__dirname, '../../../', 'uploads', 'code', 'output');
 		const cronFilePath = join(__dirname, '../../../', 'loggs', 'cron', 'cron-log.txt');
@@ -18,20 +18,19 @@ export class CronService {
 			fs.writeFileSync(cronFilePath, '', { flag: 'a' });
 		}
 
-		const logMessage = (message: string) => {
+		const logMessage = (message: string): void => {
 			const timestamp = new Date().toISOString();
 			fs.appendFile(cronFilePath, `${timestamp} - ${message}\n`, (err) => {
 				if (err) {
-					console.error(`Error writing to log file ${cronFilePath}:`, err);
+					logMessage('ERROR: ' + err.message);
 				}
 			});
 		};
 
-		const deleteFilesInDir = (dir: string) => {
+		const deleteFilesInDir = (dir: string): void => {
 			fs.readdir(dir, (err, files) => {
 				if (err) {
 					const errorMsg = `Error reading directory ${dir}: ${err}`;
-					console.error(errorMsg);
 					logMessage(errorMsg);
 					return;
 				}
