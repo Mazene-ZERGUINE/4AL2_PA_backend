@@ -1,10 +1,9 @@
 import {
-	BadRequestException,
 	Body,
 	Controller,
 	HttpCode,
 	Post,
-	UploadedFile,
+	UploadedFiles,
 	UseGuards,
 	UseInterceptors,
 } from '@nestjs/common';
@@ -20,9 +19,10 @@ import {
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard';
 import { ThrottlerGuard } from '@nestjs/throttler';
 import { codeExecutionsMulterOption } from '../../../core/middleware/multer.config';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProcessFileRequestDto } from '../dtos/request/process-file-request.dto';
 import { Express } from 'express';
+import { CodeWithFileExecutedResponseDto } from '../dtos/response/code-with-file-executed-response.dto';
 
 @UseGuards(ThrottlerGuard)
 @Controller('/code-processor')
@@ -30,7 +30,7 @@ import { Express } from 'express';
 export class CodeProcessingControllerController {
 	constructor(private readonly codeProcessorService: CodeProcessorService) {}
 
-	@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, JwtAuthGuard)
 	@Post('/run-code')
 	@HttpCode(200)
 	@ApiOkResponse({
@@ -49,9 +49,8 @@ export class CodeProcessingControllerController {
 		);
 	}
 
-	@UseGuards(JwtAuthGuard)
-	@UseGuards(ThrottlerGuard)
-	@Post('file/run-code')
+	//@UseGuards(JwtAuthGuard, ThrottlerGuard)
+	@Post('files/run-code')
 	@HttpCode(200)
 	@ApiOkResponse({
 		description: '✅ Code processed successfully',
@@ -63,14 +62,12 @@ export class CodeProcessingControllerController {
 	@ApiBadRequestResponse({
 		description: '❌ no file was provided',
 	})
-	@UseInterceptors(FileInterceptor('file', codeExecutionsMulterOption))
+	@UseInterceptors(FilesInterceptor('files', 5, codeExecutionsMulterOption))
 	@ApiConsumes('multipart/form-data')
 	async processCodeWithFile(
 		@Body() payload: ProcessFileRequestDto,
-		@UploadedFile() file: Express.Multer.File,
-	): Promise<any> {
-		if (file === undefined && file === null)
-			throw new BadRequestException('no file was provided');
-		return await this.codeProcessorService.runCodeWithFile(file, payload);
+		@UploadedFiles() files: Express.Multer.File[],
+	): Promise<CodeWithFileExecutedResponseDto> {
+		return await this.codeProcessorService.runCodeWithFiles(files, payload);
 	}
 }

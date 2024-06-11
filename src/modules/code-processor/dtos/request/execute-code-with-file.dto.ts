@@ -1,12 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProgrammingLanguage } from '../../enums/ProgrammingLanguage';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
 import { FileTypesEnum } from '../../../social-media/enums/file-types.enum';
-
-export type FilePaths = {
-	input_file_path: string;
-	output_file_path: string;
-};
 
 export class ExecuteCodeWithFileDto {
 	@ApiProperty({
@@ -26,16 +21,30 @@ export class ExecuteCodeWithFileDto {
 	@IsString()
 	@IsNotEmpty()
 	source_code: string;
-
 	@ApiProperty({
-		description: 'file_paths',
-		type: { input_file_path: String, output_file_path: String },
+		description: 'users input file paths',
+		type: String,
+		isArray: true,
 	})
-	@IsEnum(FileTypesEnum)
 	@IsNotEmpty()
-	file_paths: FilePaths;
+	@IsArray()
+	input_files_paths: string[];
 
 	@IsString()
 	@IsNotEmpty()
-	file_output_fromat: string;
+	@IsEnum(FileTypesEnum, { each: true })
+	@IsArray()
+	output_files_formats: FileTypesEnum[];
+
+	constructor(
+		ProgrammingLanguage: string,
+		sourceCode: string,
+		inputFilesPaths: string[],
+		outputFileFormats: FileTypesEnum[],
+	) {
+		this.programming_language = ProgrammingLanguage;
+		this.source_code = sourceCode;
+		this.input_files_paths = inputFilesPaths;
+		this.output_files_formats = outputFileFormats;
+	}
 }

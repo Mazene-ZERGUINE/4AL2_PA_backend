@@ -23,9 +23,10 @@ export class CodeExecutionResult {
 
 	@ApiProperty({
 		description: 'output file statuc url',
-		type: String,
+		type: [String],
+		isArray: true,
 	})
-	output_file_path: string;
+	output_file_paths: string[];
 }
 
 export class CodeWithFileExecutedResponseDto {
