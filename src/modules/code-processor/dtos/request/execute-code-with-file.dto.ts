@@ -45,6 +45,9 @@ export class ExecuteCodeWithFileDto {
 		this.programming_language = ProgrammingLanguage;
 		this.source_code = sourceCode;
 		this.input_files_paths = inputFilesPaths;
+		if (typeof outputFileFormats === 'string') {
+			outputFileFormats = [outputFileFormats];
+		}
 		this.output_files_formats = outputFileFormats;
 	}
 }

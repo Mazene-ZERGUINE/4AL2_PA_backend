@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { ProgrammingLanguage } from '../../enums/ProgrammingLanguage';
-import { IsArray, IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { FileTypesEnum } from '../../../social-media/enums/file-types.enum';
 
 export class ProcessFileRequestDto {
@@ -27,8 +27,7 @@ export class ProcessFileRequestDto {
 		type: [String],
 		isArray: true,
 	})
-	@IsArray()
 	@IsEnum(FileTypesEnum, { each: true })
-	@IsNotEmpty()
-	outputFilesFormats: FileTypesEnum[];
+	@IsOptional()
+	outputFilesFormats?: FileTypesEnum[];
 }
