@@ -48,7 +48,6 @@ export class ExecuteCodeWithFileDto {
 		if (typeof outputFileFormats === 'string') {
 			outputFileFormats = [outputFileFormats];
 		}
-		console.log(outputFileFormats);
 		this.output_files_formats = outputFileFormats;
 	}
 }
