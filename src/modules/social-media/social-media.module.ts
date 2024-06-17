@@ -15,6 +15,9 @@ import { CommentsService } from './services/comments.service';
 import { ProgramVersionEntity } from './entities/program-version.entity';
 import { VersionsController } from './controllers/versions.controller';
 import { VersionsService } from './services/versions.service';
+import { ReactionsController } from './controllers/reactions.controller';
+import { ReactionsService } from './services/reactions.service';
+import { ReactionEntity } from './entities/reaction.entity';
 
 @Module({
 	imports: [
@@ -24,6 +27,7 @@ import { VersionsService } from './services/versions.service';
 			FollowEntity,
 			CommentEntity,
 			ProgramVersionEntity,
+			ReactionEntity,
 		]),
 	],
 	exports: [UsersService, TypeOrmModule, ProgramsService],
@@ -33,6 +37,7 @@ import { VersionsService } from './services/versions.service';
 		FollowService,
 		CommentsService,
 		VersionsService,
+		ReactionsService,
 	],
 	controllers: [
 		ProgramController,
@@ -40,6 +45,7 @@ import { VersionsService } from './services/versions.service';
 		FollowController,
 		CommentsController,
 		VersionsController,
+		ReactionsController,
 	],
 })
 export class SocialMediaModule {}
