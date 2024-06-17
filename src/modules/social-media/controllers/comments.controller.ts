@@ -8,6 +8,7 @@ import {
 	Param,
 	Patch,
 	Post,
+	Query,
 	UseGuards,
 } from '@nestjs/common';
 import {
@@ -23,6 +24,7 @@ import { CreateCommentDto } from '../dtos/request/create-comment.dto';
 import { CommentsService } from '../services/comments.service';
 import { GetCommentsDto } from '../dtos/response/get-comments.dto';
 import { EditCommentDto } from '../dtos/request/edit-comment.dto';
+import { GetCommentsByLineRequestDto } from '../dtos/request/get-comments-by-line-request.dto';
 
 @ApiTags('comments')
 @Controller('comment')
@@ -90,5 +92,17 @@ export class CommentsController {
 		@Body() payload: CreateCommentDto,
 	): Promise<void> {
 		await this.commentService.respondToComment(commentId, payload);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('/line/:programId')
+	@HttpCode(200)
+	@ApiOkResponse({ type: [GetCommentsDto] })
+	@ApiBadRequestResponse()
+	@ApiNotFoundResponse()
+	async getByLines(
+		@Query() query: GetCommentsByLineRequestDto,
+	): Promise<GetCommentsDto[]> {
+		return this.commentService.getCommentsByLines(query.lineNumber, query.programId);
 	}
 }

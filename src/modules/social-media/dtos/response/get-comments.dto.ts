@@ -40,6 +40,11 @@ export class GetCommentsDto {
 	})
 	replies: GetCommentsDto[];
 
+	@ApiProperty({
+		description: 'line number if comment for code parts',
+	})
+	codeLineNumber?: number;
+
 	@ApiProperty()
 	createdAt: Date;
 
@@ -54,5 +59,6 @@ export class GetCommentsDto {
 		this.user = entity.user.toUserDataDto();
 		this.createdAt = entity.createdAt;
 		this.updatedAt = entity.updatedAt;
+		this.codeLineNumber = entity.codeLineNumber;
 	}
 }

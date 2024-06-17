@@ -82,6 +82,21 @@ export class CommentsService {
 			else throw new InternalServerErrorException(`internal server error ${error}`);
 		}
 	}
+
+	async getCommentsByLines(
+		lineNumber: number,
+		programId: string,
+	): Promise<GetCommentsDto[]> {
+		const comments = await this.commentsRepository.find({
+			where: {
+				program: { programId: programId },
+				codeLineNumber: lineNumber,
+			},
+			relations: ['user', 'replies', 'replies.user'],
+		});
+		return comments.map((comment: CommentEntity) => comment.toGetCommentDto());
+	}
+
 	private async createCommentEntity(
 		commentDto: CreateCommentDto,
 	): Promise<CommentEntity> {
