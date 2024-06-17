@@ -89,4 +89,16 @@ export class ProgramController {
 	async delete(@Param('programId') programId: string): Promise<void> {
 		await this.programService.deleteProgram(programId);
 	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('/details/:programId')
+	@HttpCode(200)
+	@ApiOkResponse({
+		description: 'return the details for program',
+		type: GetProgramDto,
+	})
+	@ApiNotFoundResponse()
+	async getOneById(@Param('programId') programId: string): Promise<GetProgramDto> {
+		return this.programService.getProgramDetails(programId);
+	}
 }

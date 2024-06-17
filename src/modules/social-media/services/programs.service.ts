@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateProgramDto } from '../dtos/request/create-program.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProgramEntity } from '../entities/program.entity';
-import { Repository } from 'typeorm';
+import { EntityNotFoundError, Repository } from 'typeorm';
 import { InternalServerErrorException } from '@nestjs/common';
 import { ProgramVisibilityEnum } from '../enums/program-visibility.enum';
 import { GetProgramDto } from '../dtos/response/get-program.dto';
@@ -82,5 +82,18 @@ export class ProgramsService {
 
 	async deleteProgram(programId: string): Promise<void> {
 		await this.programRepository.delete(programId);
+	}
+
+	async getProgramDetails(programId: string): Promise<ProgramEntity> {
+		try {
+			return await this.programRepository.findOneOrFail({
+				where: { programId: programId },
+				relations: ['user', 'reactions', 'reactions.user'],
+			});
+		} catch (error: unknown) {
+			if (error instanceof EntityNotFoundError)
+				throw new HttpNotFoundException('program not found');
+			else throw new InternalServerErrorException(error);
+		}
 	}
 }
