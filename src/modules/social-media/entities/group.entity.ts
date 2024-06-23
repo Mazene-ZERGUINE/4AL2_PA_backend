@@ -2,11 +2,14 @@ import {
 	Entity,
 	PrimaryGeneratedColumn,
 	Column,
-	OneToOne,
-	JoinColumn,
+	ManyToOne,
 	ManyToMany,
+	JoinColumn,
+	JoinTable,
 } from 'typeorm';
 import { UserEntity } from './user.entity';
+import { GroupDataDto } from '../dtos/response/group-data.dto';
+import { ProgramEntity } from './program.entity';
 
 @Entity('group')
 export class GroupEntity {
@@ -16,15 +19,35 @@ export class GroupEntity {
 	@Column({ nullable: false, length: 60 })
 	name: string;
 
-	@Column({ nullable: true, type: 'text' })
+	@Column({ nullable: true, type: 'text', default: null })
 	description?: string;
 
-	@OneToOne(() => UserEntity)
+	@Column({ nullable: true, type: 'text', default: null })
+	imageUrl?: string;
+
+	@Column({ nullable: true, type: 'text', default: 'public' })
+	visibility?: string;
+
+	@ManyToOne(() => UserEntity, (user) => user.ownedGroups, { nullable: false })
 	@JoinColumn()
 	owner: UserEntity;
 
 	@ManyToMany(() => UserEntity, (user) => user.groups)
 	members: UserEntity[];
+
+	@ManyToMany(() => ProgramEntity, (program) => program.groups, {})
+	@JoinTable({
+		name: 'group_programs',
+		joinColumn: {
+			name: 'groupId',
+			referencedColumnName: 'groupId',
+		},
+		inverseJoinColumn: {
+			name: 'programId',
+			referencedColumnName: 'programId',
+		},
+	})
+	programs: ProgramEntity[];
 
 	@Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })
 	createdAt: Date;
@@ -34,4 +57,8 @@ export class GroupEntity {
 		onUpdate: 'CURRENT_TIMESTAMP',
 	})
 	updatedAt: Date;
+
+	toDto(): GroupDataDto {
+		return new GroupDataDto(this);
+	}
 }

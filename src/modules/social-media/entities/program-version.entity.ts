@@ -17,7 +17,9 @@ export class ProgramVersionEntity {
 	@Column({ nullable: false })
 	sourceCode: string;
 
-	@ManyToOne(() => ProgramEntity, (program: ProgramEntity) => program.versions)
+	@ManyToOne(() => ProgramEntity, (program: ProgramEntity) => program.versions, {
+		onDelete: 'CASCADE',
+	})
 	program: ProgramEntity;
 
 	@Column('timestamp', { default: () => 'CURRENT_TIMESTAMP' })

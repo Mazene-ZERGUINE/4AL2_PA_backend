@@ -21,7 +21,7 @@ export const multerOptions = {
 		file: Express.Multer.File,
 		cb: (error: Error | null, acceptFile: boolean) => void,
 	): void => {
-		if (!file.mimetype.match(/\/(jpg|jpeg|png|gif)$/)) {
+		if (!file.mimetype.match(/\/(jpg|jpeg|png|gif|svg)$/)) {
 			return cb(new Error('Unsupported file type'), false);
 		}
 		cb(null, true);

@@ -39,7 +39,7 @@ export class ProgramController {
 		await this.programService.saveProgram(payload);
 	}
 
-	@UseGuards(JwtAuthGuard)
+	//@UseGuards(JwtAuthGuard)
 	@Get()
 	@HttpCode(200)
 	@ApiOkResponse()
@@ -47,6 +47,7 @@ export class ProgramController {
 	async findBy(@Query('type') type: ProgramVisibilityEnum): Promise<GetProgramDto[]> {
 		return await this.programService.getProgramByVisibility(type);
 	}
+
 	@UseGuards(JwtAuthGuard)
 	@Get('/:userId')
 	@HttpCode(200)

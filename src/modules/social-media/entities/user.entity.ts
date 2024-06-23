@@ -69,6 +69,9 @@ export class UserEntity {
 	})
 	groups: GroupEntity[];
 
+	@OneToMany(() => GroupEntity, (group) => group.owner)
+	ownedGroups: GroupEntity[];
+
 	@OneToMany(() => ReactionEntity, (reaction) => reaction.user, {
 		cascade: ['remove'],
 	})
