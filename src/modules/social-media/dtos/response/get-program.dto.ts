@@ -3,6 +3,8 @@ import { ProgrammingLanguageEnum } from '../../enums/programming-language.enum';
 import { ProgramEntity } from '../../entities/program.entity';
 import { FileTypesEnum } from '../../enums/file-types.enum';
 import { UserDataDto } from './user-data.dto';
+import { ReactionEntity } from '../../entities/reaction.entity';
+import { CommentEntity } from '../../entities/comment.entity';
 
 export class GetProgramDto {
 	programId: string;
@@ -13,6 +15,8 @@ export class GetProgramDto {
 	inputTypes: FileTypesEnum[];
 	outputTypes: FileTypesEnum[];
 	user: UserDataDto;
+	reactions: ReactionEntity[];
+	comments: CommentEntity[];
 	createdAt: Date;
 	updatedAt: Date;
 
@@ -26,6 +30,7 @@ export class GetProgramDto {
 		this.createdAt = program.createdAt;
 		this.updatedAt = program.updatedAt;
 		this.visibility = program.visibility;
+		this.reactions = program.reactions;
 		this.user = program.user ? program.user.toUserDataDto() : null;
 	}
 }

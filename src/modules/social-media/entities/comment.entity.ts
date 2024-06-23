@@ -22,7 +22,9 @@ export class CommentEntity {
 	@JoinColumn({ name: 'userId' })
 	user: UserEntity;
 
-	@ManyToOne(() => ProgramEntity, (program) => program.comments)
+	@ManyToOne(() => ProgramEntity, (program) => program.comments, {
+		onDelete: 'CASCADE',
+	})
 	@JoinColumn({ name: 'programId' })
 	program: ProgramEntity;
 

@@ -41,7 +41,7 @@ export class CodeProcessorService {
 		files: Express.Multer.File[],
 		processCodeDto: ProcessFileRequestDto,
 	): Promise<any> {
-		this.validateFiles(files);
+		//this.validateFiles(files);
 		let staticOutputFilePaths: string[] = [];
 		try {
 			const processFilePaths = this.fileUtils.processFilePath(files);

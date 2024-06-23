@@ -23,7 +23,9 @@ export class ReactionEntity {
 	@JoinColumn({ name: 'userId' })
 	user: UserEntity;
 
-	@ManyToOne(() => ProgramEntity, (program) => program.reactions)
+	@ManyToOne(() => ProgramEntity, (program) => program.reactions, {
+		onDelete: 'CASCADE',
+	})
 	@JoinColumn({ name: 'programId' })
 	program: ProgramEntity;
 

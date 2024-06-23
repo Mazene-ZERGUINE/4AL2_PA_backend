@@ -1,14 +1,14 @@
-import { ProgrammingLanguageEnum } from '../../enums/programming-language.enum';
-import { ProgramVisibilityEnum } from '../../enums/program-visibility.enum';
-import { FileTypesEnum } from '../../enums/file-types.enum';
-import { IsEnum, IsNotEmpty, IsString, IsArray, IsOptional } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { ProgrammingLanguageEnum } from '../../enums/programming-language.enum';
+import { FileTypesEnum } from '../../enums/file-types.enum';
 
-export class CreateProgramDto {
+export class CreateGroupProgramDto {
 	@ApiProperty({
 		description: 'program description text max 500 character',
 	})
 	@IsString()
+	@IsOptional()
 	description?: string;
 
 	@ApiProperty({
@@ -31,16 +31,6 @@ export class CreateProgramDto {
 	sourceCode: string;
 
 	@ApiProperty({
-		description: 'program visibility to others (public | private | only_followers)',
-		enum: ProgramVisibilityEnum,
-	})
-	@IsString()
-	@IsEnum(ProgramVisibilityEnum, {
-		message: 'Not a valid visibility type',
-	})
-	visibility: ProgramVisibilityEnum;
-
-	@ApiProperty({
 		description: 'files types that the program takes as an input',
 		example: "['txt', 'json']",
 	})
@@ -50,7 +40,7 @@ export class CreateProgramDto {
 		each: true,
 		message: 'Invalid input file type',
 	})
-	inputTypes?: FileTypesEnum[];
+	inputTypes: FileTypesEnum[];
 
 	@ApiProperty({
 		description: 'files types that the program returns as output',
@@ -71,4 +61,20 @@ export class CreateProgramDto {
 	@IsString()
 	@IsNotEmpty()
 	userId: string;
+
+	@ApiProperty({
+		description: 'group id (UUID)',
+		example: '12dx-76fzcw',
+	})
+	@IsString()
+	@IsNotEmpty()
+	groupId: string;
+
+	@ApiProperty({
+		description: 'visibility id (UUID)',
+		example: '12dx-76fzcw',
+	})
+	@IsString()
+	@IsOptional()
+	visibility?: string;
 }
