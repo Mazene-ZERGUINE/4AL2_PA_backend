@@ -122,7 +122,6 @@ export class GroupsService {
 			const user = await this.userRepository.findOneOrFail({
 				where: { userId: payload.userId },
 			});
-			console.log(user);
 			const program = new ProgramEntity(
 				payload.description,
 				payload.programmingLanguage,
