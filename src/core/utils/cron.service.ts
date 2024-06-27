@@ -35,16 +35,18 @@ export class CronService {
 					return;
 				}
 				files.forEach((file) => {
-					const filePath = path.join(dir, file);
-					fs.unlink(filePath, (err) => {
-						if (err) {
-							const errorMsg = `Error deleting file ${filePath}: ${err}`;
-							logMessage(`ERROR: ${errorMsg}`);
-						} else {
-							const successMsg = `Successfully deleted file ${filePath}`;
-							logMessage(`SUCCESS: ${successMsg}`);
-						}
-					});
+					if (file !== '.gitkeep') {
+						const filePath = path.join(dir, file);
+						fs.unlink(filePath, (err) => {
+							if (err) {
+								const errorMsg = `Error deleting file ${filePath}: ${err}`;
+								logMessage(`ERROR: ${errorMsg}`);
+							} else {
+								const successMsg = `Successfully deleted file ${filePath}`;
+								logMessage(`SUCCESS: ${successMsg}`);
+							}
+						});
+					}
 				});
 			});
 		};
