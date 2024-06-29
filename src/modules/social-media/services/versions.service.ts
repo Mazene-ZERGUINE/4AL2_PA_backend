@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProgramVersionEntity } from '../entities/program-version.entity';
 import { Repository } from 'typeorm';
@@ -15,20 +15,28 @@ export class VersionsService {
 	constructor(
 		@InjectRepository(ProgramVersionEntity)
 		private readonly versionsRepository: Repository<ProgramVersionEntity>,
-
 		@InjectRepository(ProgramEntity)
 		private readonly programRepository: Repository<ProgramEntity>,
 	) {}
 
 	async addNewVersion(createVersionDto: CreateVersionDto): Promise<void> {
-		const originalProgram = await this.programRepository.findOneBy({
-			programId: createVersionDto.programId,
+		const originalProgram = await this.programRepository.findOne({
+			where: { programId: createVersionDto.programId },
+			relations: ['versions'],
 		});
 		if (!originalProgram) {
 			throw new HttpNotFoundException(
-				"can't create new version original program not found",
+				"Can't create new version. Original program not found.",
 			);
 		}
+
+		const tagExists = originalProgram.versions?.some(
+			(programVersion) => programVersion.version === createVersionDto.version,
+		);
+		if (tagExists) {
+			throw new BadRequestException('This version tag already exists.');
+		}
+
 		const programVersionEntity = new ProgramVersionEntity(
 			originalProgram,
 			createVersionDto.programmingLanguage,
