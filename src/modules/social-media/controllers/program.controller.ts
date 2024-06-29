@@ -39,7 +39,7 @@ export class ProgramController {
 		await this.programService.saveProgram(payload);
 	}
 
-	//@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	@Get()
 	@HttpCode(200)
 	@ApiOkResponse()
@@ -70,7 +70,7 @@ export class ProgramController {
 	}
 
 	@UseGuards(JwtAuthGuard)
-	@Patch('/:programId')
+	@Patch('/edit/:programId')
 	@HttpCode(200)
 	@ApiOkResponse()
 	@ApiBadRequestResponse()

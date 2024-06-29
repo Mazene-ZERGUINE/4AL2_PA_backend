@@ -55,7 +55,7 @@ export class ProgramsService {
 	async getUserPrograms(userId: string): Promise<GetProgramDto[]> {
 		const userPrograms: ProgramEntity[] = await this.programRepository.find({
 			where: { user: { userId: userId }, isProgramGroup: false },
-			relations: ['user'],
+			relations: ['user', 'reactions', 'reactions.user'],
 		});
 		return userPrograms.map((program) => program.toGetProgramDto());
 	}

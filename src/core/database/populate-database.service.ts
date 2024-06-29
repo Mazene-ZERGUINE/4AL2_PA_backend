@@ -5,6 +5,7 @@ import { Connection } from 'typeorm';
 import { exec } from 'child_process';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import { UserEntity } from '../../modules/social-media/entities/user.entity';
 
 @Injectable()
 export class PopulateDatabaseService implements OnModuleInit {
@@ -29,9 +30,17 @@ export class PopulateDatabaseService implements OnModuleInit {
 
 	private async resetDatabase(): Promise<void> {
 		try {
-			await this.connection.query('DROP SCHEMA public CASCADE;');
-			await this.connection.query('CREATE SCHEMA public;');
-			await this.executePgDump();
+			const isEmpty = await this.isEmptyDatabase();
+			if (!isEmpty) {
+				await this.connection.query('DROP SCHEMA public CASCADE;');
+				await this.connection.query('CREATE SCHEMA public;');
+				await this.executePgDump();
+				// eslint-disable-next-line no-console
+				console.log('database has been rested successfully.');
+			} else {
+				// eslint-disable-next-line no-console
+				console.log('database is already populated with testes data');
+			}
 		} catch (error) {
 			// eslint-disable-next-line no-console
 			console.error('Error resetting database:', error);
@@ -61,5 +70,10 @@ export class PopulateDatabaseService implements OnModuleInit {
 				}
 			});
 		});
+	}
+
+	private async isEmptyDatabase(): Promise<boolean> {
+		const userRepository = this.connection.getRepository(UserEntity);
+		return (await userRepository.count()) === 0;
 	}
 }

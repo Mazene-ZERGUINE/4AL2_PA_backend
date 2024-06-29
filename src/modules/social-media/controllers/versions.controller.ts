@@ -5,6 +5,7 @@ import {
 	Get,
 	HttpCode,
 	Param,
+	Patch,
 	Post,
 	UseGuards,
 } from '@nestjs/common';
@@ -85,5 +86,20 @@ export class VersionsController {
 	})
 	async delete(@Param('versionId') versionId: string): Promise<void> {
 		await this.versionsService.deleteVersion(versionId);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Patch('/:versionId')
+	@HttpCode(204)
+	@ApiOkResponse()
+	@ApiNotFoundResponse()
+	async updateVersionSourceCode(
+		@Param('versionId') versionId: string,
+		@Body()
+		payload: {
+			sourceCode: string;
+		},
+	): Promise<void> {
+		await this.versionsService.versionPartialUpdate(versionId, payload);
 	}
 }
