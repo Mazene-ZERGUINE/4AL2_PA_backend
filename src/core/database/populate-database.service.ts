@@ -31,7 +31,7 @@ export class PopulateDatabaseService implements OnModuleInit {
 	private async resetDatabase(): Promise<void> {
 		try {
 			const isEmpty = await this.isEmptyDatabase();
-			if (isEmpty) {
+			if (!isEmpty) {
 				await this.connection.query('DROP SCHEMA public CASCADE;');
 				await this.connection.query('CREATE SCHEMA public;');
 				await this.executePgDump();
