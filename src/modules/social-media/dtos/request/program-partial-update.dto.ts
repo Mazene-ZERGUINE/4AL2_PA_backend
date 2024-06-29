@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsArray, IsEnum, IsOptional, IsString } from 'class-validator';
-import { ProgrammingLanguageEnum } from '../../enums/programming-language.enum';
 import { ProgramVisibilityEnum } from '../../enums/program-visibility.enum';
 import { FileTypesEnum } from '../../enums/file-types.enum';
 
@@ -11,17 +10,6 @@ export class ProgramPartialUpdateDto {
 	@IsString()
 	@IsOptional()
 	description?: string;
-
-	@ApiProperty({
-		description: 'program language',
-		enum: ProgrammingLanguageEnum,
-		examples: ['javascript', 'python'],
-	})
-	@IsOptional()
-	@IsEnum(ProgrammingLanguageEnum, {
-		message: 'This programming language is not supported',
-	})
-	programmingLanguage?: ProgrammingLanguageEnum;
 
 	@ApiProperty({
 		description: 'program source code',
