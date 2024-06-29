@@ -76,4 +76,21 @@ export class VersionsService {
 			throw new HttpNotFoundException('version not found');
 		}
 	}
+
+	async versionPartialUpdate(
+		versionId: string,
+		payload: {
+			sourceCode: string;
+		},
+	): Promise<void> {
+		try {
+			const entity = await this.versionsRepository.findOneOrFail({
+				where: { programVersionId: versionId },
+			});
+			entity.sourceCode = payload.sourceCode;
+			await this.versionsRepository.save(entity);
+		} catch (error: unknown) {
+			throw new HttpNotFoundException('version not found');
+		}
+	}
 }
