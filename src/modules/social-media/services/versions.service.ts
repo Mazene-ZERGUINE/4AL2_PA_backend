@@ -49,7 +49,7 @@ export class VersionsService {
 	async getProgramVersion(programId: string): Promise<ProgramVersionResponseDto> {
 		const program = await this.programRepository.findOne({
 			where: { programId: programId },
-			relations: ['versions'],
+			relations: ['versions', 'comments'],
 		});
 		if (!program) {
 			throw new HttpNotFoundException('program not found');
@@ -62,6 +62,7 @@ export class VersionsService {
 		try {
 			const version = await this.versionsRepository.findOneOrFail({
 				where: { programVersionId: programVersion },
+				relations: ['comments'],
 			});
 			return version.toProgramVersions();
 		} catch (error: unknown) {
