@@ -21,7 +21,7 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "prestart": "npm run build"
-	},
+  },
   "dependencies": {
     "@nestjs/common": "^10.3.9",
     "@nestjs/config": "^3.2.2",
@@ -29,11 +29,13 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.3.8",
+    "@nestjs/platform-socket.io": "^10.3.9",
     "@nestjs/schedule": "^4.0.2",
     "@nestjs/serve-static": "^4.0.2",
     "@nestjs/swagger": "^7.3.1",
     "@nestjs/throttler": "^5.1.2",
     "@nestjs/typeorm": "^10.0.2",
+    "@nestjs/websockets": "^10.3.9",
     "axios": "^1.6.8",
     "bcrypt": "^5.1.1",
     "class-transformer": "^0.5.1",
@@ -49,6 +51,7 @@
     "pg": "^8.11.5",
     "reflect-metadata": "^0.1.13",
     "rxjs": "^7.8.1",
+    "socket.io": "^4.7.5",
     "typeorm": "^0.3.20"
   },
   "devDependencies": {

@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ReactionEntity } from '../entities/reaction.entity';
 import { Repository } from 'typeorm';
 import { LikeRequestDto } from '../dtos/request/like-request.dto';
 import { ReactionTypeEnum } from '../enums/reaction-type.enum';
 import { UserEntity } from '../entities/user.entity';
 import { ProgramEntity } from '../entities/program.entity';
+import { LikesGateway } from 'src/likes.gateway';
+import { ReactionEntity } from '../entities/reaction.entity';
 
 @Injectable()
 export class ReactionsService {
 	constructor(
 		@InjectRepository(ReactionEntity)
 		private readonly reactionRepository: Repository<ReactionEntity>,
+		private readonly likesGateway: LikesGateway,
 	) {}
 
 	async likeProgram(likeRequestDto: LikeRequestDto): Promise<void> {
@@ -37,6 +39,10 @@ export class ReactionsService {
 			});
 			await this.reactionRepository.save(reactionEntity);
 		}
+
+		this.likesGateway.server.emit(ReactionTypeEnum.LIKE, {
+			postId: likeRequestDto.programId,
+		});
 	}
 
 	async dislikeProgram(likeRequestDto: LikeRequestDto): Promise<void> {
@@ -62,5 +68,9 @@ export class ReactionsService {
 			});
 			await this.reactionRepository.save(reactionEntity);
 		}
+
+		this.likesGateway.server.emit(ReactionTypeEnum.DISLIKE, {
+			postId: likeRequestDto.programId,
+		});
 	}
 }

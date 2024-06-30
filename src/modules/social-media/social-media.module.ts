@@ -21,6 +21,7 @@ import { ReactionEntity } from './entities/reaction.entity';
 import { GroupsController } from './controllers/groups.controller';
 import { GroupsService } from './services/groups.service';
 import { GroupEntity } from './entities/group.entity';
+import { LikesGateway } from 'src/likes.gateway';
 
 @Module({
 	imports: [
@@ -43,6 +44,7 @@ import { GroupEntity } from './entities/group.entity';
 		VersionsService,
 		ReactionsService,
 		GroupsService,
+		LikesGateway,
 	],
 	controllers: [
 		ProgramController,
