@@ -5,11 +5,13 @@ import {
 	WebSocketServer,
 } from '@nestjs/websockets';
 import { Server } from 'socket.io';
-import { ReactionTypeEnum } from './modules/social-media/enums/reaction-type.enum';
+import { ReactionTypeEnum } from '../../modules/social-media/enums/reaction-type.enum';
 
 @WebSocketGateway({
 	cors: {
-		origin: '*',
+		origin: 'http://localhost:4200',
+		methods: ['GET', 'POST'],
+		credentials: true,
 	},
 	namespace: '/events',
 })
