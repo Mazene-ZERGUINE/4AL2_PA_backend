@@ -20,12 +20,15 @@ export class CollaborativeCodingGateway
 {
 	@WebSocketServer() server: Server;
 	private sessions: Map<string, string> = new Map();
+	private pendingAuthorizations: Map<string, string[]> = new Map();
 
 	handleConnection(client: Socket) {
+		// eslint-disable-next-line no-console
 		console.log(`Client connected: ${client.id}`);
 	}
 
 	handleDisconnect(client: Socket) {
+		// eslint-disable-next-line no-console
 		console.log(`Client disconnected: ${client.id}`);
 	}
 
@@ -39,8 +42,62 @@ export class CollaborativeCodingGateway
 				this.sessions.set(sessionId, '');
 			}
 		} catch (error) {
-			console.error('Error joining session:', error);
 			client.emit('error', 'Failed to join session');
+		}
+	}
+
+	@SubscribeMessage('requestAccess')
+	handleRequestAccess(client: Socket, sessionId: string): void {
+		try {
+			this.server.to(sessionId).emit('requestAuthorization');
+			if (!this.pendingAuthorizations.has(sessionId)) {
+				this.pendingAuthorizations.set(sessionId, []);
+			}
+			this.pendingAuthorizations.get(sessionId)?.push(client.id);
+		} catch (error) {
+			client.emit('error', 'Failed to request access');
+		}
+	}
+
+	@SubscribeMessage('grantAccess')
+	handleGrantAccess(client: Socket, sessionId: string): void {
+		try {
+			const pendingClients = this.pendingAuthorizations.get(sessionId);
+			if (pendingClients) {
+				pendingClients.forEach((clientId) => {
+					const clientSocket = this.getSocketById(clientId);
+					if (clientSocket) {
+						clientSocket.emit('authorizationGranted');
+					} else {
+						// eslint-disable-next-line no-console
+						console.error(`Client socket not found for ID: ${clientId}`);
+					}
+				});
+				this.pendingAuthorizations.delete(sessionId);
+			}
+		} catch (error) {
+			client.emit('error', 'Failed to grant access');
+		}
+	}
+
+	@SubscribeMessage('denyAccess')
+	handleDenyAccess(client: Socket, sessionId: string): void {
+		try {
+			const pendingClients = this.pendingAuthorizations.get(sessionId);
+			if (pendingClients) {
+				pendingClients.forEach((clientId) => {
+					const clientSocket = this.getSocketById(clientId);
+					if (clientSocket) {
+						clientSocket.emit('authorizationDenied');
+					} else {
+						// eslint-disable-next-line no-console
+						console.error(`Client socket not found for ID: ${clientId}`);
+					}
+				});
+				this.pendingAuthorizations.delete(sessionId);
+			}
+		} catch (error) {
+			client.emit('error', 'Failed to deny access');
 		}
 	}
 
@@ -73,5 +130,10 @@ export class CollaborativeCodingGateway
 		} catch (error) {
 			client.emit('error', 'Failed to update cursor');
 		}
+	}
+
+	private getSocketById(clientId: string): Socket | undefined {
+		const sockets = this.server.sockets as any;
+		return sockets.get(clientId) ?? undefined;
 	}
 }
