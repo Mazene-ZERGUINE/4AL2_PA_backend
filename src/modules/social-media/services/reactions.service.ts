@@ -5,7 +5,7 @@ import { LikeRequestDto } from '../dtos/request/like-request.dto';
 import { ReactionTypeEnum } from '../enums/reaction-type.enum';
 import { UserEntity } from '../entities/user.entity';
 import { ProgramEntity } from '../entities/program.entity';
-import { LikesGateway } from 'src/likes.gateway';
+import { LikesGateway } from 'src/core/websocket/likes.gateway';
 import { ReactionEntity } from '../entities/reaction.entity';
 
 @Injectable()

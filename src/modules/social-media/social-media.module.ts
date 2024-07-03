@@ -21,7 +21,7 @@ import { ReactionEntity } from './entities/reaction.entity';
 import { GroupsController } from './controllers/groups.controller';
 import { GroupsService } from './services/groups.service';
 import { GroupEntity } from './entities/group.entity';
-import { LikesGateway } from 'src/likes.gateway';
+import { LikesGateway } from 'src/core/websocket/likes.gateway';
 
 @Module({
 	imports: [
