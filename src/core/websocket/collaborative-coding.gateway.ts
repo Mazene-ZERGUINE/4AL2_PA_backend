@@ -22,12 +22,12 @@ export class CollaborativeCodingGateway
 	private sessions: Map<string, string> = new Map();
 	private pendingAuthorizations: Map<string, string[]> = new Map();
 
-	handleConnection(client: Socket) {
+	handleConnection(client: Socket): void {
 		// eslint-disable-next-line no-console
 		console.log(`Client connected: ${client.id}`);
 	}
 
-	handleDisconnect(client: Socket) {
+	handleDisconnect(client: Socket): void {
 		// eslint-disable-next-line no-console
 		console.log(`Client disconnected: ${client.id}`);
 	}
