@@ -39,13 +39,24 @@ export class ProgramController {
 		await this.programService.saveProgram(payload);
 	}
 
-	//@UseGuards(JwtAuthGuard)
+	@UseGuards(JwtAuthGuard)
 	@Get()
 	@HttpCode(200)
 	@ApiOkResponse()
 	@ApiBadRequestResponse()
 	async findBy(@Query('type') type: ProgramVisibilityEnum): Promise<GetProgramDto[]> {
 		return await this.programService.getProgramByVisibility(type);
+	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('/files')
+	@HttpCode(200)
+	@ApiOkResponse()
+	@ApiBadRequestResponse()
+	async findByFiles(
+		@Query('type') type: ProgramVisibilityEnum,
+	): Promise<GetProgramDto[]> {
+		return await this.programService.getProgramByVisibilityAndFiles(type);
 	}
 
 	@UseGuards(JwtAuthGuard)
