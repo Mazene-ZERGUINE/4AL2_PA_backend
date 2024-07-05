@@ -100,4 +100,18 @@ export class ProgramsService {
 			else throw new InternalServerErrorException(error);
 		}
 	}
+
+	async getProgramByVisibilityAndFiles(
+		visibility: ProgramVisibilityEnum,
+	): Promise<GetProgramDto[]> {
+		const visiblePrograms: ProgramEntity[] = await this.programRepository.find({
+			where: { visibility: visibility, isProgramGroup: false },
+			relations: ['user', 'reactions', 'reactions.user'],
+		});
+		const filtredPrograms = visiblePrograms.filter(
+			(program: ProgramEntity) =>
+				program.inputTypes.length > 0 && program.outputTypes.length > 0,
+		);
+		return filtredPrograms.map((entity) => entity.toGetProgramDto());
+	}
 }

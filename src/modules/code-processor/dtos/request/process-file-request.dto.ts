@@ -30,4 +30,14 @@ export class ProcessFileRequestDto {
 	@IsEnum(FileTypesEnum, { each: true })
 	@IsOptional()
 	outputFilesFormats?: FileTypesEnum[];
+
+	constructor(
+		programmingLanguage: ProgrammingLanguage,
+		sourceCode: string,
+		outputFilesFormats: FileTypesEnum[],
+	) {
+		this.programmingLanguage = programmingLanguage;
+		this.sourceCode = sourceCode;
+		this.outputFilesFormats = outputFilesFormats;
+	}
 }

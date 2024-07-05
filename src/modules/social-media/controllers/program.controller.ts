@@ -49,6 +49,17 @@ export class ProgramController {
 	}
 
 	@UseGuards(JwtAuthGuard)
+	@Get('/files')
+	@HttpCode(200)
+	@ApiOkResponse()
+	@ApiBadRequestResponse()
+	async findByFiles(
+		@Query('type') type: ProgramVisibilityEnum,
+	): Promise<GetProgramDto[]> {
+		return await this.programService.getProgramByVisibilityAndFiles(type);
+	}
+
+	@UseGuards(JwtAuthGuard)
 	@Get('/:userId')
 	@HttpCode(200)
 	@ApiOkResponse({ description: 'return the list of all user programs' })
