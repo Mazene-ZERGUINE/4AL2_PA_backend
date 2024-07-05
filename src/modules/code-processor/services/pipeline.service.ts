@@ -17,7 +17,7 @@ export class PipelineService {
 
 	async runPipelineWithFiles(
 		startingFile: Express.Multer.File[],
-		programsData: any,
+		programsData: { programs: GetProgramDto[] },
 	): Promise<any> {
 		const outputFiles = [];
 		let error: string = '';
@@ -58,7 +58,6 @@ export class PipelineService {
 				error = err.message;
 				break;
 			}
-			console.log('ok');
 		}
 
 		if (success) {
@@ -79,7 +78,6 @@ export class PipelineService {
 			path: filePath,
 			size: 0,
 		} as Express.Multer.File;
-		console.log(file);
 		return file;
 	}
 
