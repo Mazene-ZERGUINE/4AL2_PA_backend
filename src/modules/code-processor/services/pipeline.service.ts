@@ -38,7 +38,7 @@ export class PipelineService {
 					currentInputFile,
 					processFileRequestDto,
 				);
-				if (result.result.output_file_paths) {
+				if (result.result.output_file_paths.length > 0) {
 					result.result.output_file_paths.forEach((outputFilePath) => {
 						outputFiles.push(outputFilePath);
 					});
@@ -50,7 +50,7 @@ export class PipelineService {
 					);
 				} else {
 					success = false;
-					error = 'No output files generated';
+					error = result.result.stderr;
 					break;
 				}
 			} catch (err) {
