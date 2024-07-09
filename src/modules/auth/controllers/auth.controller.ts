@@ -83,4 +83,17 @@ export class AuthController {
 	): Promise<void> {
 		await this.authService.updatePassword(payload, userId);
 	}
+
+	@UseGuards(JwtAuthGuard)
+	@Get('/logout/:userId')
+	@HttpCode(200)
+	@ApiOkResponse({
+		description: 'user logout',
+	})
+	@ApiBadRequestResponse({
+		description: 'current password does not mathc',
+	})
+	async logout(@Param('userId') userId: string): Promise<void> {
+		await this.authService.logout(userId);
+	}
 }

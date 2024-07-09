@@ -23,10 +23,11 @@ export class AuthService {
 		if (!user) {
 			throw new HttpNotFoundException('user not found');
 		}
-
 		if (!(await this.isPasswordMatching(loginDTO.password, user.password))) {
 			throw new HttpNotFoundException('Bad credentials');
 		}
+
+		user.connectedAt = new Date();
 		return {
 			accessToken: await this.jwtService.signAsync({
 				email: user.email,
@@ -46,6 +47,12 @@ export class AuthService {
 			throw new BadRequestException("current password don't match");
 		}
 		user.password = await hash(payload.newPassword, await genSalt());
+		await this.userService.save(user);
+	}
+
+	async logout(userId: string): Promise<void> {
+		const user = await this.userService.findById(userId);
+		user.disconnectedAt = new Date();
 		await this.userService.save(user);
 	}
 

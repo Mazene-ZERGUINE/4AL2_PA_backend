@@ -91,6 +91,12 @@ export class UserEntity {
 	})
 	updatedAt: Date;
 
+	@Column({ type: Date, nullable: true })
+	connectedAt: Date;
+
+	@Column({ type: Date, nullable: true })
+	disconnectedAt: Date;
+
 	toUserDataDto(): UserDataDto {
 		return new UserDataDto(
 			this.userId,
@@ -100,6 +106,7 @@ export class UserEntity {
 			this.email,
 			this.bio,
 			this.avatarUrl,
+			this.disconnectedAt,
 		);
 	}
 }
