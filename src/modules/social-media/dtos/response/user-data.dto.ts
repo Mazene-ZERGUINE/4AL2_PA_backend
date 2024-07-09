@@ -6,6 +6,8 @@ export class UserDataDto {
 	email: string;
 	bio?: string;
 	avatarUrl?: string;
+	disconnectedAt: Date;
+
 	constructor(
 		userId: string,
 		userName: string,
@@ -14,6 +16,7 @@ export class UserDataDto {
 		email: string,
 		bio: string,
 		avatarUrl: string,
+		disconnectedAt: Date,
 	) {
 		this.userId = userId;
 		this.userName = userName;
@@ -22,5 +25,6 @@ export class UserDataDto {
 		this.email = email;
 		this.bio = bio;
 		this.avatarUrl = avatarUrl;
+		this.disconnectedAt = disconnectedAt;
 	}
 }
