@@ -106,6 +106,7 @@ export class UserEntity {
 			this.email,
 			this.bio,
 			this.avatarUrl,
+			this.connectedAt,
 			this.disconnectedAt,
 		);
 	}
