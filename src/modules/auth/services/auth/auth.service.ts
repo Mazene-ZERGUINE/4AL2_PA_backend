@@ -28,6 +28,7 @@ export class AuthService {
 		}
 
 		user.connectedAt = new Date();
+		await this.userService.save(user);
 		return {
 			accessToken: await this.jwtService.signAsync({
 				email: user.email,
@@ -53,6 +54,7 @@ export class AuthService {
 	async logout(userId: string): Promise<void> {
 		const user = await this.userService.findById(userId);
 		user.disconnectedAt = new Date();
+		user.connectedAt = null;
 		await this.userService.save(user);
 	}
 
