@@ -1,8 +1,4 @@
-import {
-	BadRequestException,
-	Injectable,
-	InternalServerErrorException,
-} from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { HttpService } from './http.service';
 import { CodeResultsResponseDto } from '../dtos/response/code-results-response.dto';
 import { CodeExecutedResponseDto } from '../dtos/response/code-executed-response.dto';
@@ -41,7 +37,6 @@ export class CodeProcessorService {
 		files: Express.Multer.File[],
 		processCodeDto: ProcessFileRequestDto,
 	): Promise<any> {
-		//this.validateFiles(files);
 		let staticOutputFilePaths: string[] = [];
 		try {
 			const processFilePaths = this.fileUtils.processFilePath(files);
@@ -55,17 +50,10 @@ export class CodeProcessorService {
 			staticOutputFilePaths = await this.downloadAndTransformFiles(
 				taskResult.result.output_file_paths,
 			);
-			await this.deleteOutputFiles(staticOutputFilePaths);
 			taskResult.result.output_file_paths = staticOutputFilePaths;
 			return taskResult;
 		} finally {
 			this.cleanupFiles(files);
-		}
-	}
-
-	private validateFiles(files: Express.Multer.File[]): void {
-		if (!files || files.length === 0) {
-			throw new BadRequestException('No files were provided');
 		}
 	}
 
@@ -115,28 +103,11 @@ export class CodeProcessorService {
 			if (!newFilePath) {
 				throw new InternalServerErrorException('Failed to download output result file');
 			}
-			const fileName = this.extractFileName(newFilePath);
-			const transformedFilePath = this.fileUtils.transformToStaticFile(fileName);
-			staticOutputFilePaths.push(transformedFilePath);
-			return transformedFilePath;
+			staticOutputFilePaths.push(filePath);
+			return filePath;
 		});
 		await Promise.all(downloadPromises);
 		return staticOutputFilePaths;
-	}
-
-	private async deleteOutputFiles(staticOutputFilePaths: string[]): Promise<void> {
-		const deletePromises = staticOutputFilePaths.map(async (filePath) => {
-			const newFileName = this.extractFileName(filePath);
-			const deleteFileUrl = `file/delete?file=${newFileName}`;
-			const deleteResult = await this.httpService.delete<{
-				status: number;
-				success: boolean;
-			}>(deleteFileUrl);
-			if (deleteResult.status !== 200 || !deleteResult.success) {
-				throw new InternalServerErrorException('Failed to delete the file');
-			}
-		});
-		await Promise.all(deletePromises);
 	}
 
 	private cleanupFiles(files: Express.Multer.File[]): void {
@@ -144,11 +115,6 @@ export class CodeProcessorService {
 			this.fileUtils.checkFileIfExists(file.path);
 			this.fileUtils.removeTmpFiles(file.path);
 		});
-	}
-
-	private extractFileName(filePath: string): string {
-		const pathSegments = filePath.split('/');
-		return pathSegments[pathSegments.length - 1];
 	}
 
 	private async checkTaskStatus(
