@@ -7,13 +7,17 @@ import { ProgrammingLanguage } from '../enums/ProgrammingLanguage';
 import * as fs from 'fs';
 import * as path from 'path';
 import { join } from 'path';
+import { HttpService } from './http.service';
 
 @Injectable()
 export class PipelineService {
 	private readonly inputDirPath = join(__dirname, '../../../..');
 	private readonly outputDirPath = join(__dirname, '../../../..');
 
-	constructor(private readonly runCodeService: CodeProcessorService) {}
+	constructor(
+		private readonly runCodeService: CodeProcessorService,
+		private readonly httpService: HttpService,
+	) {}
 
 	async runPipelineWithFiles(
 		startingFile: Express.Multer.File[],
@@ -39,9 +43,10 @@ export class PipelineService {
 					processFileRequestDto,
 				);
 				if (result.result.output_file_paths.length > 0) {
-					result.result.output_file_paths.forEach((outputFilePath) => {
-						outputFiles.push(outputFilePath);
-					});
+					for (const outputFilePath of result.result.output_file_paths) {
+						const localFilePath = await this.httpService.downloadFile(outputFilePath);
+						outputFiles.push(localFilePath);
+					}
 					await this.copyFilesToInputDirectory(outputFiles, 'uploads/code/input');
 					currentInputFile = outputFiles.map((filePath) =>
 						this.createFileObject(
@@ -87,10 +92,9 @@ export class PipelineService {
 	): Promise<void> {
 		return new Promise((resolve, reject) => {
 			filePaths.forEach((filePath, index) => {
-				const targetPath =
-					this.inputDirPath + '/' + path.join(targetDirectory, path.basename(filePath));
-				const fileDir = this.inputDirPath + '/' + filePath.split('3000')[1];
-				fs.copyFile(fileDir, targetPath, (err) => {
+				const fileName = path.basename(filePath); // Extract the filename
+				const targetPath = path.join(this.inputDirPath, targetDirectory, fileName);
+				fs.copyFile(filePath, targetPath, (err) => {
 					if (err) {
 						reject(err);
 					}
