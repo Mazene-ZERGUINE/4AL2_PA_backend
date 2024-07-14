@@ -20,6 +20,7 @@ export class PopulateDatabaseService implements OnModuleInit {
 
 		// Determine the correct path based on existence
 		this.pgFilePath = existsSync(srcPath) ? srcPath : distPath;
+		console.log(`Using SQL dump file at path: ${this.pgFilePath}`);
 	}
 
 	async onModuleInit(): Promise<void> {
@@ -35,14 +36,11 @@ export class PopulateDatabaseService implements OnModuleInit {
 				await this.connection.query('DROP SCHEMA public CASCADE;');
 				await this.connection.query('CREATE SCHEMA public;');
 				await this.executePgDump();
-				// eslint-disable-next-line no-console
-				console.log('database has been rested successfully.');
+				console.log('Database has been reset successfully.');
 			} else {
-				// eslint-disable-next-line no-console
-				console.log('database is already populated with testes data');
+				console.log('Database is already populated with test data.');
 			}
 		} catch (error) {
-			// eslint-disable-next-line no-console
 			console.error('Error resetting database:', error);
 		}
 	}
@@ -53,19 +51,19 @@ export class PopulateDatabaseService implements OnModuleInit {
 			const dbName = this.configService.get('DATABASE_NAME');
 			const dbHost = this.configService.get('DATABASE_HOST');
 			const dbPort = this.configService.get<number>('DATABASE_PORT', 5432);
+			const dbPassword = this.configService.get('DATABASE_PASSWORD');
 
-			const command = `PGPASSWORD=${this.configService.get(
-				'DATABASE_PASSWORD',
-			)} psql -U ${dbUser} -h ${dbHost} -p ${dbPort} -d ${dbName} -f ${this.pgFilePath}`;
+			const command = `PGPASSWORD=${dbPassword} psql -U ${dbUser} -h ${dbHost} -p ${dbPort} -d ${dbName} -f ${this.pgFilePath}`;
+			console.log(`Executing command: ${command}`);
 
-			exec(command, (error) => {
+			exec(command, (error, stdout, stderr) => {
 				if (error) {
-					// eslint-disable-next-line no-console
 					console.error('Error executing pg_dump:', error);
+					console.error('stderr:', stderr);
 					reject(error);
 				} else {
-					// eslint-disable-next-line no-console
 					console.log('Database populated successfully');
+					console.log('stdout:', stdout);
 					resolve();
 				}
 			});
