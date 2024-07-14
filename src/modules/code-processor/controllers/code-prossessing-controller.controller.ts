@@ -30,7 +30,7 @@ import { CodeWithFileExecutedResponseDto } from '../dtos/response/code-with-file
 export class CodeProcessingControllerController {
 	constructor(private readonly codeProcessorService: CodeProcessorService) {}
 
-	@UseGuards(JwtAuthGuard, JwtAuthGuard)
+	@UseGuards(JwtAuthGuard, ThrottlerGuard)
 	@Post('/run-code')
 	@HttpCode(200)
 	@ApiOkResponse({
@@ -49,7 +49,7 @@ export class CodeProcessingControllerController {
 		);
 	}
 
-	//@UseGuards(JwtAuthGuard, ThrottlerGuard)
+	@UseGuards(JwtAuthGuard, ThrottlerGuard)
 	@Post('files/run-code')
 	@HttpCode(200)
 	@ApiOkResponse({

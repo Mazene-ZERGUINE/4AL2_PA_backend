@@ -20,7 +20,7 @@ export class HttpService {
 		this.axiosInstance = axios.create({
 			baseURL: this.configService.get(
 				'CODE_RUNNER_SERVICE_API',
-				'http://127.0.0.1:8080/\n',
+				'http://cdr.esgithub.org/',
 			),
 			headers: {
 				'Content-Type': 'application/json',
@@ -29,17 +29,16 @@ export class HttpService {
 	}
 
 	async get<T>(url: string): Promise<T> {
-		const response = (await this.axiosInstance.get(url)) as AxiosResponse<T>;
-		return response.data;
+		try {
+			const response = (await this.axiosInstance.get(url)) as AxiosResponse<T>;
+			return response.data;
+		} catch (error) {
+			console.error(error);
+		}
 	}
 
 	async post<T, D>(url: string, data?: D): Promise<T> {
 		const response = (await this.axiosInstance.post(url, data)) as AxiosResponse<T>;
-		return response.data;
-	}
-
-	async delete<T>(url: string): Promise<T> {
-		const response = (await this.axiosInstance.delete(url)) as AxiosResponse<T>;
 		return response.data;
 	}
 
