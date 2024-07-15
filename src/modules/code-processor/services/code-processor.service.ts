@@ -3,12 +3,12 @@ import { HttpService } from './http.service';
 import { CodeResultsResponseDto } from '../dtos/response/code-results-response.dto';
 import { CodeExecutedResponseDto } from '../dtos/response/code-executed-response.dto';
 import { ProgrammingLanguage } from '../enums/ProgrammingLanguage';
+import { TimeoutException } from '../../../core/exceptions/TimeoutException';
 import { ProcessFileRequestDto } from '../dtos/request/process-file-request.dto';
 import { Express } from 'express';
 import { CodeWithFileExecutedResponseDto } from '../dtos/response/code-with-file-executed-response.dto';
 import { FilesHandlerUtils } from '../utils/files-handler.utils';
 import { ExecuteCodeWithFileDto } from '../dtos/request/execute-code-with-file.dto';
-import { TimeoutException } from '../../../core/exceptions/TimeoutException';
 
 @Injectable()
 export class CodeProcessorService {
@@ -17,15 +17,9 @@ export class CodeProcessorService {
 		private readonly fileUtils: FilesHandlerUtils,
 	) {}
 
-	private delay(ms: number): Promise<void> {
-		return new Promise((resolve) => setTimeout(resolve, ms));
-	}
-
 	async runCode(
 		sourceCode: string,
 		programmingLanguage: ProgrammingLanguage,
-		maxRetries: number = 3,
-		retryDelay: number = 2000,
 	): Promise<CodeResultsResponseDto> {
 		const data = {
 			programming_language: programmingLanguage,
@@ -35,22 +29,8 @@ export class CodeProcessorService {
 			'execute/',
 			data,
 		);
-		let taskResult: CodeResultsResponseDto;
-		for (let attempt = 1; attempt <= maxRetries; attempt++) {
-			taskResult = (await this.checkTaskStatus(
-				response.task_id,
-			)) as CodeResultsResponseDto;
-
-			if (!(taskResult.result as any).error) {
-				return taskResult;
-			}
-			if (attempt < maxRetries) {
-				await this.delay(retryDelay);
-			}
-		}
-		throw new TimeoutException(
-			'Failed to get successful task result after multiple attempts',
-		);
+		const taskResult = await this.checkTaskStatus(response.task_id);
+		return taskResult as CodeResultsResponseDto;
 	}
 
 	async runCodeWithFiles(
@@ -144,10 +124,11 @@ export class CodeProcessorService {
 			const taskResult = await this.httpService.get<CodeResultsResponseDto>(
 				`result/${taskId}`,
 			);
-			if (taskResult.status === 'Completed') {
+			if (taskResult.status !== 'Pending') {
 				return taskResult;
 			}
 			await new Promise((resolve) => setTimeout(resolve, 2000));
 		}
+		throw new TimeoutException('request timeout');
 	}
 }
