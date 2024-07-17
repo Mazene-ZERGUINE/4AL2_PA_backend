@@ -17,8 +17,5 @@ export function createTypeOrmConfig(configService: ConfigService): TypeOrmModule
 		database: configService.get<string>('DATABASE_NAME'),
 		entities: [__dirname + '/../../**/*.entity.{js,ts}'],
 		synchronize: configService.get<boolean>('TYPEORM_SYNC', true),
-		ssl: {
-			rejectUnauthorized: false,
-		},
 	};
 }
