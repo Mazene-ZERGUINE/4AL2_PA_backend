@@ -9,7 +9,7 @@ import {
 	Request,
 	UseGuards,
 	Get,
-	Put,
+	Patch,
 } from '@nestjs/common';
 import { UsersService } from '../services/users.service';
 import { UpdateAccountDto } from '../dtos/request/update-account.dto';
@@ -32,7 +32,7 @@ export class UsersController {
 	private readonly apiUrl = this.configService.get<string>('STATIC_IMAGES_URL');
 
 	@UseGuards(JwtAuthGuard)
-	@Put('/update/:userId')
+	@Patch('/update/:userId')
 	@HttpCode(200)
 	@ApiOkResponse({
 		description: 'user account is updated no values are returned',
