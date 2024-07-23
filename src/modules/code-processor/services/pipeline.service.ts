@@ -66,7 +66,12 @@ export class PipelineService {
 		}
 
 		if (success) {
-			return { success, outputFiles };
+			const outputLinks = outputFiles.map((file) =>
+				file.replace('/var/www/4AL2_PA_backend/', ''),
+			);
+
+			//console.log(outputLinks)
+			return { success, outputLinks };
 		} else {
 			return { success, error };
 		}
@@ -92,7 +97,7 @@ export class PipelineService {
 	): Promise<void> {
 		return new Promise((resolve, reject) => {
 			filePaths.forEach((filePath, index) => {
-				const fileName = path.basename(filePath); // Extract the filename
+				const fileName = path.basename(filePath);
 				const targetPath = path.join(this.inputDirPath, targetDirectory, fileName);
 				fs.copyFile(filePath, targetPath, (err) => {
 					if (err) {
